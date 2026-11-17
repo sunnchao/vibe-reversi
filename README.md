@@ -1,13 +1,16 @@
 # 《技能黑白棋 · 翻盘棋》完整实现与验收报告
 
-> 口号：**“明明只剩 3 个子，一步全翻回来！”**
 > 架构：**TypeScript + 原生 Canvas 2D + 微信云开发（core 纯逻辑与 UI 彻底解耦）**
+
+2026-11-17 界面更新采用纸本棋谱与实体棋桌风格：纸色、墨绿、朱砂色和宋体标题，配本地棋盘插画。交互原型由 OpenDesign 生成并已保存到 [design/open-design/index.html](design/open-design/index.html)，页面状态说明见 [design/OPEN_DESIGN_NOTES.md](design/OPEN_DESIGN_NOTES.md)。七个页面统一了按钮、禁用状态与确认弹层；补全了关卡目录、技能详情及玩法示意、房间数字键盘、键盘输入与粘贴、回合提示、上一手标记和电脑应手等待。
+
+好友房创建、加入、落子与结束通过事务化房间服务同步，按 revision 去重，并支持离房、后台恢复和 90 秒断线提示。跨设备微信联机需配置真实 AppID、云环境与 `rooms` 集合权限。
 
 ---
 
 ## 一、快速运行与验收方式
 
-### 1. 运行全量自动化验收测试套件（共 33 项测试）
+### 1. 运行全量自动化验收测试套件（共 46 项测试）
 ```bash
 npm test
 ```
@@ -16,17 +19,22 @@ npm test
 - `npm run test:skills`：阶段 3（能量增长与上限 + **六大技能各 3 个边界与金身子冲突单测** + **两人同屏完整打完一局六技能各用一次**）
 - `npm run test:ai`：阶段 4（20 关配置表与本地/云存档合并 + 新手第 1 关 3 局必胜验证 + **50 局 L3 vs L2 自动对弈胜率与单步耗时基准统计**）
 - `npm run test:net`：阶段 5（6 位好友房创建/加入/满房拒绝/30 分钟过期 + **服务端复用 core 防作弊复验拦截改包** + 「求你等我」同意/拒绝流转 + **杀进程重进恢复棋盘** + **90 秒无心跳掉线判胜** + 双端完整对局）
-- `npm run test:ui`：阶段 2 & 阶段 6（7 大页面渲染与导航热区 + 三大动画状态机 + 本局最大翻盘步自动计算与微信战绩分享卡片）
+- `npm run test:ui`：七大页面渲染、声音/特效设置、确认弹层、技能详情、窄屏热区边界、双端房间完整流转、电脑延迟应手、翻子动画与战绩文案
+- `npm run test:preview`：本地 HTTP 邀请服务身份隔离、房间同步、非法落子拦截与满房拒绝
 
-### 2. 编译打包（微信小游戏包 `game.js` + 云函数包 `cloudfunctions/reversiRoom/index.js`）
+### 2. 编译和微信工程
 ```bash
 npm run typecheck
 npm run build
+npm run build:wechat
 ```
 
+正式真机联机前，请设置 `WECHAT_APPID` 和 `WECHAT_CLOUD_ENV`。详细部署与提审清单见 [微信发布方案](wechat/RELEASE_PLAN.md)。
+
 ### 3. 直接预览体验
-- **微信开发者工具**：打开本项目目录 `/Volumes/T7 Mac/Development/vibe-reversi`（已含 `project.config.json`、`game.json`、`game.js` 及 `cloudfunctions/reversiRoom`）。
-- **浏览器直接预览**：双击或用浏览器打开根目录下的 `preview.html`，即可在手机模拟器边框内完整体验 7 大页面、人机 20 关、双人同屏、好友房联机与六大逆转技能。
+- **微信开发者工具**：小游戏工程在 `dist/wechat-game`，原生小程序 Canvas 兼容壳在 `dist/wechat-miniprogram`。当前工作区仍用 AppID 占位值，开发者工具会拒绝，不能用于提审。
+- **同局浏览器预览**：运行 `npm run preview`，访问终端显示的本机或同 Wi-Fi 地址；可开第二个标签或设备，通过分享链接或六位房号加入同一局。
+- 游戏包含落子回弹、翻转、炸弹粒子与胜局彩屑，以及本地原创音效、音量、震动和动态特效设置。
 
 ---
 
