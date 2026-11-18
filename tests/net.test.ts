@@ -234,4 +234,38 @@ describe('阶段 5：好友房联机与服务端防作弊复验测试', () => {
     expect(room.gameState!.isGameOver).toBe(true);
     expect(room.gameState!.winner).not.toBeNull();
   });
+
+  it('5. 房主离房会关闭等待房，进行中离房按认输结算并递增 revision', async () => {
+    const { host, guest, stranger } = setupPair();
+    const created = await host.createRoom(['bomb']);
+    const roomId = created.data!.roomId;
+    expect(created.data!.revision).toBe(0);
+    await guest.joinRoom(roomId, ['shield']);
+    const moved = await host.submitMove({ roomId, actionType: 'move', row: 2, col: 3 });
+    expect(moved.data!.revision).toBe(2);
+
+    const leave = await host.leaveRoom(roomId);
+    expect(leave.ok).toBe(true);
+    expect(leave.data!.status).toBe('finished');
+    expect(leave.data!.gameState!.winner).toBe(Piece.White);
+    expect(leave.data!.revision).toBe(3);
+    const lateJoin = await stranger.joinRoom(roomId, ['bomb']);
+    expect(lateJoin.ok).toBe(false);
+    expect(lateJoin.error).toContain('已满');
+  });
+
+  it('6. 经典黑白好友房由服务端创建无技能对局，技能房保持原有招式', async () => {
+    const { host, guest } = setupPair();
+    const classic = await host.createRoom(['bomb', 'shield', 'wait'], 'classic');
+    expect(classic.ok).toBe(true);
+    expect(classic.data!.variant).toBe('classic');
+
+    const joined = await guest.joinRoom(classic.data!.roomId, ['steal', 'double', 'wait']);
+    expect(joined.ok).toBe(true);
+    expect(joined.data!.gameState!.players[Piece.Black].equippedSkills).toEqual([]);
+    expect(joined.data!.gameState!.players[Piece.White].equippedSkills).toEqual([]);
+
+    const skills = await host.createRoom(['bomb', 'shield', 'wait'], 'skills');
+    expect(skills.data!.variant).toBe('skills');
+  });
 });

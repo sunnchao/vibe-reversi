@@ -33,6 +33,7 @@ export const ROOM_EXPIRE_MS = 30 * 60 * 1000;      // 30 分钟过期自动失�
 export const HEARTBEAT_TIMEOUT_MS = 90 * 1000;     // 90 秒无心跳判掉线
 
 export type RoomStatus = 'waiting' | 'playing' | 'finished' | 'expired';
+export type RuleVariant = 'classic' | 'skills';
 
 export interface RoomPlayerInfo {
   openId: string;
@@ -53,6 +54,8 @@ export interface RoomDocument {
   gameState: GameState | null;
   createdAt: number;
   updatedAt: number;
+  revision: number;
+  variant?: RuleVariant;
 }
 
 export interface SubmitMovePayload {
@@ -70,6 +73,7 @@ export interface CloudResponse<T = unknown> {
   ok: boolean;
   error?: string;
   data?: T;
+  playerColor?: PlayerColor;
 }
 
 /**
@@ -147,17 +151,21 @@ export class ReversiCloudService {
     openId: string;
     nickname: string;
     equippedSkills: SkillId[];
+    variant?: RuleVariant;
     now?: number;
   }): Promise<CloudResponse<RoomDocument>> {
     const now = params.now ?? Date.now();
     let roomId = this.generate6DigitRoomId();
+    let available = false;
     for (let retry = 0; retry < 10; retry++) {
       const existing = await this.db.getRoom(roomId);
       if (!existing || now - existing.updatedAt > ROOM_EXPIRE_MS) {
+        available = true;
         break;
       }
       roomId = this.generate6DigitRoomId();
     }
+    if (!available) return { ok: false, error: '房间暂时繁忙，请重新创建' };
 
     const room: RoomDocument = {
       roomId,
@@ -175,10 +183,12 @@ export class ReversiCloudService {
       gameState: null,
       createdAt: now,
       updatedAt: now,
+      revision: 0,
+      variant: params.variant === 'classic' ? 'classic' : 'skills',
     };
 
     await this.db.saveRoom(room);
-    return { ok: true, data: room };
+    return { ok: true, data: room, playerColor: Piece.Black };
   }
 
   /**
@@ -198,7 +208,7 @@ export class ReversiCloudService {
     }
 
     // 检查是否超过 30 分钟未更新（过期房自动失效）
-    if (now - room.updatedAt > ROOM_EXPIRE_MS) {
+    if (room.status === 'expired' || now - room.updatedAt > ROOM_EXPIRE_MS) {
       room.status = 'expired';
       await this.db.saveRoom(room);
       return { ok: false, error: '该房间已超过 30 分钟自动失效' };
@@ -209,19 +219,20 @@ export class ReversiCloudService {
       room.hostInfo.lastHeartbeatAt = now;
       room.updatedAt = now;
       await this.db.saveRoom(room);
-      return { ok: true, data: room };
+      return { ok: true, data: room, playerColor: Piece.Black };
     }
     if (room.guestOpenId === params.openId && room.guestInfo) {
       room.guestInfo.lastHeartbeatAt = now;
       room.updatedAt = now;
       await this.db.saveRoom(room);
-      return { ok: true, data: room };
+      return { ok: true, data: room, playerColor: Piece.White };
     }
 
     // 情况 B：房间已满
     if (room.guestOpenId && room.guestOpenId !== params.openId) {
       return { ok: false, error: '房间人数已满' };
     }
+    if (room.status !== 'waiting') return { ok: false, error: '房间已结束，请朋友创建新房间' };
 
     // 情况 C：新房客加入并自动开局（黑先：房主执黑，房客执白）
     room.guestOpenId = params.openId;
@@ -233,15 +244,17 @@ export class ReversiCloudService {
       lastHeartbeatAt: now,
     };
     room.status = 'playing';
+    const variant = room.variant === 'classic' ? 'classic' : 'skills';
     room.gameState = createGame({
       mode: 'online',
-      blackSkills: room.hostInfo.equippedSkills,
-      whiteSkills: room.guestInfo.equippedSkills,
+      blackSkills: variant === 'classic' ? [] : room.hostInfo.equippedSkills,
+      whiteSkills: variant === 'classic' ? [] : room.guestInfo.equippedSkills,
     });
     room.updatedAt = now;
+    room.revision = (room.revision ?? 0) + 1;
 
     await this.db.saveRoom(room);
-    return { ok: true, data: room };
+    return { ok: true, data: room, playerColor: Piece.White };
   }
 
   /**
@@ -276,6 +289,7 @@ export class ReversiCloudService {
       room.gameState = surrenderGame(room.gameState, playerColor);
       room.status = 'finished';
       room.updatedAt = now;
+      room.revision = (room.revision ?? 0) + 1;
       await this.db.saveRoom(room);
       return { ok: true, data: room };
     }
@@ -364,6 +378,7 @@ export class ReversiCloudService {
       room.status = 'finished';
     }
     room.updatedAt = now;
+    room.revision = (room.revision ?? 0) + 1;
     await this.db.saveRoom(room);
 
     return { ok: true, data: room };
@@ -418,7 +433,9 @@ export class ReversiCloudService {
     }
 
     room.gameState = res.state;
+    if (res.state.isGameOver) room.status = 'finished';
     room.updatedAt = now;
+    room.revision = (room.revision ?? 0) + 1;
     await this.db.saveRoom(room);
     return { ok: true, data: room };
   }
@@ -446,6 +463,7 @@ export class ReversiCloudService {
     }
 
     const playerColor = this.getPlayerColor(room, params.openId);
+    if (!playerColor) return { ok: false, error: '非本房间玩家' };
     if (playerColor === Piece.Black) {
       room.hostInfo.lastHeartbeatAt = now;
     } else if (playerColor === Piece.White && room.guestInfo) {
@@ -474,16 +492,34 @@ export class ReversiCloudService {
       room.gameState = surrenderGame(room.gameState, opponentColor);
       room.status = 'finished';
       room.updatedAt = now;
+      room.revision = (room.revision ?? 0) + 1;
     }
 
     await this.db.saveRoom(room);
     return {
       ok: true,
+      playerColor,
       data: {
         room,
         opponentDisconnected,
         opponentIdleMs,
       },
     };
+  }
+
+  async leaveRoom(params: { roomId: string; openId: string; now?: number }): Promise<CloudResponse<RoomDocument>> {
+    const room = await this.db.getRoom(params.roomId);
+    if (!room) return { ok: false, error: '房间不存在' };
+    const color = this.getPlayerColor(room, params.openId);
+    if (!color) return { ok: false, error: '非本房间玩家' };
+    if (room.status === 'waiting') room.status = 'expired';
+    else if (room.status === 'playing' && room.gameState) {
+      room.gameState = surrenderGame(room.gameState, color);
+      room.status = 'finished';
+    }
+    room.updatedAt = params.now ?? Date.now();
+    room.revision = (room.revision ?? 0) + 1;
+    await this.db.saveRoom(room);
+    return { ok: true, data: room, playerColor: color };
   }
 }

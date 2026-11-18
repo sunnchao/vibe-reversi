@@ -1,10 +1,5 @@
 /**
- * 表现层三大核心动画控制器（消费 core 层输出的 GameEvent，UI 不自己算规则）
- * 严格遵循清单第 4 节：
- * 动画只做三处（多了拖工期）：
- * 1. 翻子翻转动画（FlipAnimation：3D 水平缩放 scaleX 从 1 -> 0 -> 1 变色，逐子错开延迟）
- * 2. 炸弹子爆炸帧（BombExplosionAnimation：十字激波扩散 + 火花粒子帧）
- * 3. 终局子数滚动结算（ResultRollAnimation：比分从 0 滚动递增到最终子数）
+ * Event-driven presentation state. All animations are bounded and do not change rules.
  */
 
 import { GameEvent, Piece, PlayerColor, Position } from '../core';
@@ -32,11 +27,24 @@ export interface ScoreRollAnim {
   durationMs: number;
 }
 
+export interface BoardEffect {
+  kind: 'place' | 'bomb' | 'shield' | 'steal' | 'double' | 'wait' | 'undo';
+  position?: Position;
+  startTimeMs: number;
+  durationMs: number;
+}
+
 export class AnimationManager {
   public flipItems: FlipAnimItem[] = [];
   public bombExplosions: BombExplosionAnim[] = [];
   public scoreRoll: ScoreRollAnim | null = null;
   public toastMessage: { text: string; expireAt: number } | null = null;
+  public boardEffects: BoardEffect[] = [];
+  public pressedButton: { id: string; until: number } | null = null;
+
+  private effect(kind: BoardEffect['kind'], nowMs: number, position?: Position, durationMs = 620): void {
+    this.boardEffects.push({ kind, position, startTimeMs: nowMs, durationMs });
+  }
 
   /**
    * 消费 core 引擎产生的结构化事件列表并创建对应动画
@@ -44,6 +52,7 @@ export class AnimationManager {
   consumeEvents(events: GameEvent[], nowMs = Date.now()): void {
     for (const ev of events) {
       if (ev.type === 'MOVE_PLACED') {
+        this.effect('place', nowMs, ev.position, 380);
         const fromColor = ev.player === Piece.Black ? Piece.White : Piece.Black;
         ev.flipped.forEach((pos, idx) => {
           this.flipItems.push({
@@ -56,6 +65,7 @@ export class AnimationManager {
           });
         });
       } else if (ev.type === 'BOMB_EXPLODED') {
+        this.effect('bomb', nowMs, ev.center, 720);
         const fromColor = ev.player === Piece.Black ? Piece.White : Piece.Black;
         this.bombExplosions.push({
           center: ev.center,
@@ -74,11 +84,12 @@ export class AnimationManager {
           });
         });
         this.showToast(
-          `💥 炸弹子十字爆破 +${ev.bombedPositions.length} 子！`,
+          `炸弹子触发：十字翻转 ${ev.bombedPositions.length} 子`,
           nowMs,
           1800
         );
       } else if (ev.type === 'PIECE_STOLEN') {
+        this.effect('steal', nowMs, ev.position);
         const fromColor = ev.player === Piece.Black ? Piece.White : Piece.Black;
         this.flipItems.push({
           row: ev.position.row,
@@ -88,30 +99,54 @@ export class AnimationManager {
           startTimeMs: nowMs,
           durationMs: 360,
         });
-        this.showToast('☯️ 偷天换日！敌子直接易帜', nowMs, 1800);
+        this.showToast('偷天换日：棋子已易色', nowMs, 1800);
       } else if (ev.type === 'SHIELD_APPLIED') {
-        this.showToast('🛡️ 金身护体！此子永不可被翻', nowMs, 1600);
+        this.effect('shield', nowMs, ev.position, 800);
+        this.showToast('金身生效：此子本局不可被翻', nowMs, 1600);
       } else if (ev.type === 'DOUBLE_STEP_1_DONE') {
-        this.showToast('⚡ 连落双子：请继续落第 2 子！', nowMs, 2000);
+        this.effect('double', nowMs, ev.position);
+        this.showToast('连落双子：请落下第二子', nowMs, 2000);
       } else if (ev.type === 'DOUBLE_STEP_2_REFUNDED') {
         this.showToast(
-          `⚡ 次子无合法点，自动退还 +${ev.refundEnergy} 能量`,
+          `次子无合法点，已退还 ${ev.refundEnergy} 能量`,
           nowMs,
           2200
         );
       } else if (ev.type === 'TURN_PASSED') {
         const who = ev.player === Piece.Black ? '黑方' : '白方';
         if (ev.reason === 'NO_VALID_MOVE') {
-          this.showToast(`⚠️ ${who}无合法落子，自动跳过回合`, nowMs, 1800);
+          this.showToast(`${who}无合法落子，自动跳过`, nowMs, 1800);
         } else {
-          this.showToast(`⏳ ${who}发动【求你等我】换取 +20 能量`, nowMs, 1800);
+          this.showToast(`${who}发动「求你等我」，获得能量`, nowMs, 1800);
         }
       } else if (ev.type === 'UNDO_PERFORMED') {
-        this.showToast('⏪ 悔棋时光：已回溯至上一回合', nowMs, 1800);
+        this.effect('undo', nowMs, undefined, 700);
+        this.showToast('悔棋时光：已回到上个回合', nowMs, 1800);
+      } else if (ev.type === 'WAIT_RESOLVED' && ev.approved) {
+        this.effect('wait', nowMs, undefined, 800);
       } else if (ev.type === 'GAME_OVER') {
         this.startScoreRoll(ev.blackCount, ev.whiteCount, nowMs);
       }
     }
+  }
+
+  busyUntil(): number {
+    return Math.max(
+      0,
+      ...this.flipItems.map((item) => item.startTimeMs + item.durationMs),
+      ...this.boardEffects.filter((effect) => effect.kind === 'bomb' || effect.kind === 'steal')
+        .map((effect) => effect.startTimeMs + effect.durationMs)
+    );
+  }
+
+  getPlaceScale(row: number, col: number, nowMs: number): number {
+    const item = [...this.boardEffects].reverse().find((effect) =>
+      effect.kind === 'place' && effect.position?.row === row && effect.position.col === col
+    );
+    if (!item) return 1;
+    const progress = Math.max(0, Math.min(1, (nowMs - item.startTimeMs) / 260));
+    const overshoot = 1.7;
+    return Math.max(0.12, 1 + (overshoot + 1) * (progress - 1) ** 3 + overshoot * (progress - 1) ** 2);
   }
 
   showToast(text: string, nowMs = Date.now(), durationMs = 1800): void {
@@ -197,6 +232,8 @@ export class AnimationManager {
     this.bombExplosions = this.bombExplosions.filter(
       (b) => nowMs <= b.startTimeMs + b.durationMs
     );
+    this.boardEffects = this.boardEffects.filter((effect) => nowMs <= effect.startTimeMs + effect.durationMs);
+    if (this.pressedButton && nowMs > this.pressedButton.until) this.pressedButton = null;
     if (this.toastMessage && nowMs > this.toastMessage.expireAt) {
       this.toastMessage = null;
     }

@@ -1,0 +1,9 @@
+{
+  "pages": [{ "path": "pages/index/index", "style": { "navigationStyle": "custom", "disableScroll": true } }],
+  "globalStyle": {
+    "navigationStyle": "custom",
+    "navigationBarTitleText": "翻盘棋",
+    "backgroundColor": "#e9e3d4",
+    "backgroundTextStyle": "dark"
+  }
+}

@@ -1,138 +1,190 @@
-/**
- * 微信云开发云函数入口：reversiRoom
- * 复用 src/core 规则引擎与 src/net/protocol 的 ReversiCloudService，
- * 服务端严格复验每步落子与技能合法性，防止客户端改包作弊。
- */
+import { dispatchRoomAction } from '../../src/net/dispatch';
+import { dispatchFriends } from '../../src/friends/rooms';
+import type { FriendRoom } from '../../src/friends/rooms';
+import { ReversiCloudService, RoomDatabaseAdapter, RoomDocument } from '../../src/net/protocol';
+import { UserProgress } from '../../src/net/storage';
 
-import { SkillId } from '../../src/config/skills';
-import { Piece } from '../../src/core';
-import {
-  InMemoryCloudDatabase,
-  ReversiCloudService,
-  RoomDatabaseAdapter,
-  RoomDocument,
-  UserProgress,
-} from '../../src/net';
+interface TransactionStore {
+  collection(name: string): {
+    doc(id: string): {
+      get(): Promise<{ data?: Record<string, unknown> | null }>;
+      set(options: { data: Record<string, unknown> }): Promise<unknown>;
+    };
+  };
+}
 
-// 若在真实微信云开发环境中运行，自动挂载 wx-server-sdk 数据库集合 `rooms` 与 `users`
-function createCloudDbAdapter(): RoomDatabaseAdapter {
+function transactionAdapter(store: TransactionStore): RoomDatabaseAdapter {
+  return {
+    async getRoom(roomId) {
+      const result = await store.collection('rooms').doc(roomId).get();
+      return (result.data as unknown as RoomDocument | null) ?? null;
+    },
+    async saveRoom(room) {
+      const data = { ...room } as unknown as Record<string, unknown>;
+      delete data._id;
+      await store.collection('rooms').doc(room.roomId).set({ data });
+    },
+    async getUser(openId) {
+      const result = await store.collection('users').doc(openId).get();
+      return (result.data?.progress as UserProgress | undefined) ?? null;
+    },
+    async saveUser(openId, progress) {
+      await store.collection('users').doc(openId).set({ data: { openId, progress } });
+    },
+  };
+}
+
+/** Every room mutation runs in a database transaction, including simultaneous joins. */
+export async function main(event: unknown): Promise<unknown> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const cloud = require('wx-server-sdk');
     cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
-    const db = cloud.database();
-    const roomsCol = db.collection('rooms');
-    const usersCol = db.collection('users');
-
+    const openId = cloud.getWXContext().OPENID;
+    if (typeof openId !== 'string' || !openId.trim()) {
+      return { ok: false, error: '无法确认微信身份，请从微信重新进入' };
+    }
+    const db = cloud.database({ throwOnNotFound: false });
+    const input = event && typeof event === 'object'
+      ? event as Record<string, unknown>
+      : {};
+    if (input.action === 'friends') {
+      const isMissingCollection = (error: unknown): boolean =>
+        /collection not exists|Db or Table not exist/i.test(
+          error instanceof Error ? error.message : String(error),
+        );
+      const createFriendRooms = async (): Promise<void> => {
+        const createCollection = (db as unknown as {
+          createCollection?: (name: string) => Promise<unknown>;
+        }).createCollection;
+        if (typeof createCollection === 'function') {
+          try { await createCollection.call(db, 'friendRooms'); } catch {}
+        }
+      };
+      try {
+        await db.collection('friendRooms').limit(1).get();
+      } catch (error) {
+        if (isMissingCollection(error)) await createFriendRooms();
+      }
+      const runFriendsTransaction = () => db.runTransaction((transaction: TransactionStore) =>
+        dispatchFriends({
+          async get(code) {
+            const result = await transaction.collection('friendRooms').doc(code).get();
+            return (result.data as unknown as FriendRoom | null) ?? null;
+          },
+          async set(room) {
+            const data = { ...room } as unknown as Record<string, unknown>;
+            delete data._id;
+            await transaction.collection('friendRooms').doc(room.code).set({ data });
+          },
+        }, event, openId)
+      );
+      try {
+        return await runFriendsTransaction();
+      } catch (error) {
+        if (!isMissingCollection(error)) throw error;
+        await createFriendRooms();
+        return await runFriendsTransaction();
+      }
+    }
+    if (input.action === 'selftest') {
+      return await runCloudSelfTest(db, openId);
+    }
+    try {
+      const exists = await db.collection('rooms').limit(1).get();
+      void exists;
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      if (/collection not exists|Db or Table not exist/i.test(detail)) {
+        const createCollection = (db as unknown as {
+          createCollection?: (name: string) => Promise<unknown>;
+        }).createCollection;
+        if (typeof createCollection === 'function') {
+          try { await createCollection.call(db, 'rooms'); } catch {}
+        }
+      }
+    }
+    return await db.runTransaction((transaction: TransactionStore) =>
+      dispatchRoomAction(new ReversiCloudService(transactionAdapter(transaction)), event, openId)
+    );
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
     return {
-      async getRoom(roomId: string): Promise<RoomDocument | null> {
-        const res = await roomsCol.where({ roomId }).limit(1).get();
-        return (res.data && res.data[0]) || null;
-      },
-      async saveRoom(room: RoomDocument): Promise<void> {
-        const existing = await roomsCol.where({ roomId: room.roomId }).limit(1).get();
-        if (existing.data && existing.data.length > 0) {
-          const docId = existing.data[0]._id;
-          const copy = { ...room } as Record<string, unknown>;
-          delete copy._id;
-          await roomsCol.doc(docId).update({ data: copy });
-        } else {
-          await roomsCol.add({ data: room });
-        }
-      },
-      async getUser(openId: string): Promise<UserProgress | null> {
-        const res = await usersCol.where({ openId }).limit(1).get();
-        return (res.data && res.data[0]?.progress) || null;
-      },
-      async saveUser(openId: string, progress: UserProgress): Promise<void> {
-        const existing = await usersCol.where({ openId }).limit(1).get();
-        if (existing.data && existing.data.length > 0) {
-          await usersCol.doc(existing.data[0]._id).update({
-            data: { progress, updatedAt: Date.now() },
-          });
-        } else {
-          await usersCol.add({
-            data: { openId, progress, updatedAt: Date.now() },
-          });
-        }
-      },
+      ok: false,
+      error: '云端服务暂不可用，请检查环境、集合和云函数部署状态',
+      detail: detail.slice(0, 500),
     };
-  } catch {
-    return new InMemoryCloudDatabase();
   }
 }
 
-const adapter = createCloudDbAdapter();
-const service = new ReversiCloudService(adapter);
-
-export interface CloudEvent {
-  action:
-    | 'createRoom'
-    | 'joinRoom'
-    | 'submitMove'
-    | 'requestSkill'
-    | 'respondSkill'
-    | 'syncState';
-  roomId?: string;
-  openId?: string;
-  nickname?: string;
-  equippedSkills?: SkillId[];
-  actionType?: 'move' | 'skill' | 'pass' | 'surrender';
-  skillId?: SkillId;
-  row?: number;
-  col?: number;
-  approved?: boolean;
-  claimDisconnectWin?: boolean;
-  claimedBoardAfter?: Piece[][];
-}
-
-export async function main(event: CloudEvent, context?: unknown): Promise<unknown> {
-  void context;
-  const openId = event.openId ?? 'wx_anonymous_openid';
-
-  switch (event.action) {
-    case 'createRoom':
-      return service.createRoom({
-        openId,
-        nickname: event.nickname ?? '微信玩家',
-        equippedSkills: event.equippedSkills ?? ['bomb', 'shield', 'wait'],
-      });
-    case 'joinRoom':
-      return service.joinRoom({
-        roomId: event.roomId ?? '',
-        openId,
-        nickname: event.nickname ?? '好友玩家',
-        equippedSkills: event.equippedSkills ?? ['bomb', 'shield', 'wait'],
-      });
-    case 'submitMove':
-      return service.submitMove({
-        roomId: event.roomId ?? '',
-        openId,
-        actionType: event.actionType ?? 'move',
-        skillId: event.skillId,
-        row: event.row,
-        col: event.col,
-        claimedBoardAfter: event.claimedBoardAfter,
-      });
-    case 'requestSkill':
-      return service.requestSkill({
-        roomId: event.roomId ?? '',
-        openId,
-        skillId: event.skillId ?? 'wait',
-      });
-    case 'respondSkill':
-      return service.respondSkill({
-        roomId: event.roomId ?? '',
-        openId,
-        approved: Boolean(event.approved),
-      });
-    case 'syncState':
-      return service.syncState({
-        roomId: event.roomId ?? '',
-        openId,
-        claimDisconnectWin: event.claimDisconnectWin,
-      });
-    default:
-      return { ok: false, error: `未知云函数 action: ${String(event.action)}` };
+async function runCloudSelfTest(
+  db: any,
+  openId: string
+): Promise<unknown> {
+  const rooms = db.collection('rooms');
+  const guestId = `selftest_guest_${Date.now()}`;
+  const now = Date.now();
+  const create = await dispatchRoomAction(
+    new ReversiCloudService(transactionAdapter(db)),
+    {
+      action: 'createRoom',
+      equippedSkills: ['bomb', 'shield', 'wait'],
+      variant: 'skills',
+    },
+    openId
+  ) as { ok: boolean; data?: RoomDocument; error?: string };
+  if (!create.ok || !create.data) {
+    return { ok: false, step: 'create', create };
+  }
+  const createdRoomId = create.data.roomId;
+  const service = new ReversiCloudService(transactionAdapter(db));
+  const join = await service.joinRoom({
+    roomId: createdRoomId,
+    openId: guestId,
+    nickname: '云函数自检棋手',
+    equippedSkills: ['steal', 'double', 'wait'],
+    now: now + 1,
+  });
+  if (!join.ok || !join.data?.gameState) {
+    return { ok: false, step: 'join', create, join };
+  }
+  const move = await service.submitMove({
+    roomId: createdRoomId,
+    openId,
+    actionType: 'move',
+    row: 2,
+    col: 3,
+    now: now + 2,
+  });
+  const sync = await service.syncState({
+    roomId: createdRoomId,
+    openId,
+    now: now + 3,
+  });
+  const record = await rooms.doc(createdRoomId).get();
+  const stored = record.data as RoomDocument | null;
+  const result = {
+    ok: Boolean(
+      move.ok &&
+      sync.ok &&
+      stored?.gameState?.stepIndex === 1 &&
+      stored.hostOpenId === openId
+    ),
+    roomId: createdRoomId,
+    revision: stored?.revision,
+    stepIndex: stored?.gameState?.stepIndex,
+    blackPieces: stored?.gameState?.board.flat().filter((piece) => piece === 1).length,
+    whitePieces: stored?.gameState?.board.flat().filter((piece) => piece === 2).length,
+    hasSkills: Boolean(stored?.gameState?.players[1].equippedSkills.length),
+    cleanup: false,
+  };
+  try {
+    await rooms.doc(createdRoomId).remove();
+    return { ...result, cleanup: true };
+  } catch (error) {
+    return {
+      ...result,
+      cleanup: false,
+      cleanupError: error instanceof Error ? error.message : String(error),
+    };
   }
 }

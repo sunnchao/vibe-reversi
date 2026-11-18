@@ -1,0 +1,40 @@
+/* Keep uni-app's late-loaded button defaults below every design class rule. */
+.reversi-app button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: center;
+  overflow: visible;
+}
+.reversi-app button::after {
+  content: none;
+  width: auto;
+  height: auto;
+  position: static;
+  inset: auto;
+  border: 0;
+  border-radius: 0;
+  transform: none;
+}
+/* Disabled native buttons otherwise acquire an opaque white background. */
+.reversi-app .primary[disabled] {
+  background-color: var(--felt);
+  color: var(--ivory);
+}
+.reversi-app .cell[disabled],
+.reversi-app .text-btn[disabled],
+.reversi-app .secondary[disabled] {
+  background-color: transparent;
+  color: inherit;
+}

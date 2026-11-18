@@ -1,0 +1,20 @@
+{
+  "name": "翻盘棋",
+  "appid": "",
+  "description": "黑白之间，总有一手新可能。",
+  "versionName": "1.1.0",
+  "versionCode": "110",
+  "vueVersion": "3",
+  "transformPx": false,
+  "h5": { "router": { "mode": "hash" }, "title": "翻盘棋 · 邀位好友，落子翻盘" },
+  "mp-weixin": {
+    "appid": "",
+    "compileType": "miniprogram",
+    "miniprogramRoot": "./",
+    "cloudfunctionRoot": "cloudfunctions/",
+    "setting": { "urlCheck": true, "es6": true, "minified": true },
+    "packOptions": { "ignore": [{ "type": "folder", "value": "cloudfunctions" }] },
+    "usingComponents": true,
+    "libVersion": "3.14.2"
+  }
+}

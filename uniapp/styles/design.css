@@ -1,0 +1,4037 @@
+/* Generated from Open Design index.html by scripts/import-opendesign.mjs.
+ * Color mixes use the original unrounded tokens, with premultiplied alpha.
+ * Layout, media/container queries, focus states and animation values are retained.
+ */
+
+.reversi-app {
+  --bg: rgb(233, 227, 212);
+  --surface: rgb(242, 236, 224);
+  --fg: rgb(29, 43, 37);
+  --muted: rgb(78, 92, 86);
+  --border: rgb(187, 180, 162);
+  --accent: rgb(185, 77, 53);
+  --accent-ink: rgb(162, 56, 32);
+  --felt: rgb(36, 77, 62);
+  --felt-dark: rgb(20, 50, 39);
+  --brass: rgb(187, 146, 80);
+  --wood: rgb(135, 91, 47);
+  --wood-dark: rgb(77, 49, 19);
+  --ivory: rgb(245, 238, 221);
+  --black: rgb(13, 19, 16);
+  --white: rgb(254, 252, 247);
+  --hover: rgb(215, 211, 195);
+  --display: "Songti SC","STSong","Noto Serif CJK SC",Georgia,serif;
+  --body: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono: "SFMono-Regular",Consolas,monospace;
+  --phone-h: 100dvh;
+  --grain: url("/static/paper-grain.png");
+}
+
+.reversi-app view, .reversi-app text, .reversi-app button, .reversi-app image, .reversi-app scroll-view, .reversi-app input, .reversi-app view::before, .reversi-app text::before, .reversi-app button::before, .reversi-app image::before, .reversi-app scroll-view::before, .reversi-app input::before, .reversi-app view::after, .reversi-app text::after, .reversi-app button::after, .reversi-app image::after, .reversi-app scroll-view::after, .reversi-app input::after {
+  box-sizing: border-box;
+}
+
+page {
+  -webkit-text-size-adjust: 100%;
+}
+
+.reversi-app {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.7 var(--body);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.reversi-app .h1, .reversi-app .h2, .reversi-app .h3, .reversi-app .p, .reversi-app .list {
+  margin: 0;
+}
+
+.reversi-app button, .reversi-app input {
+  font: inherit;
+  color: inherit;
+}
+
+.reversi-app button, .reversi-app .link, .reversi-app input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reversi-app button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  letter-spacing: .02em;
+  touch-action: manipulation;
+}
+
+.reversi-app button[disabled] {
+  cursor: default;
+  opacity: .4;
+}
+
+.reversi-app button:focus-visible, .reversi-app input:focus-visible, .reversi-app [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.reversi-app button:active:not([disabled]) {
+  transform: translateY(1px);
+}
+
+.reversi-app button[disabled]:active {
+  transform: none;
+}
+
+.reversi-app .link {
+  color: inherit;
+}
+
+.reversi-app .image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.reversi-app .board, .reversi-app .keypad, .reversi-app .bottom-nav, .reversi-app .game-tools {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.reversi-app .app-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+.reversi-app .h1, .reversi-app .h2, .reversi-app .h3 {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.reversi-app .p {
+  text-wrap: pretty;
+}
+
+.reversi-app button {
+  transition: background .18s,border-color .18s,transform .16s;
+}
+
+.reversi-app ::selection {
+  background: rgb(213, 195, 160);
+}
+
+.reversi-app [hidden] {
+  display: none!important;
+}
+
+.reversi-app .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+.reversi-app .caps {
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+
+.reversi-app .quiet {
+  color: var(--muted);
+}
+
+.reversi-app .small {
+  font-size: 12px;
+}
+
+.reversi-app .serif {
+  font-family: var(--display);
+}
+
+.reversi-app .desk {
+  width: min(1180px,100%);
+  height: 100dvh;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 390px 1fr;
+  align-items: center;
+  gap: 66px;
+}
+
+.reversi-app .desk:before {
+  content: "";
+  position: fixed;
+  inset: 26px;
+  border: 1px solid rgba(187, 180, 162, 0.52);
+  pointer-events: none;
+}
+
+.reversi-app .margin-note {
+  align-self: center;
+  min-width: 0;
+}
+
+.reversi-app .margin-note.left {
+  padding-left: 10px;
+}
+
+.reversi-app .desktop-folio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--fg);
+  padding-top: 10px;
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.reversi-app .desktop-title {
+  font-family: var(--display);
+  font-size: 68px;
+  line-height: 1.4;
+  letter-spacing: .06em;
+  margin: 35px 0 22px;
+  font-weight: 600;
+}
+
+.reversi-app .desktop-sub {
+  font-family: var(--display);
+  font-size: 19px;
+  line-height: 1.9;
+}
+
+.reversi-app .desktop-foot {
+  border-top: 1px solid var(--border);
+  margin-top: 50px;
+  padding-top: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.reversi-app .manual-title {
+  font: 600 19px/1.5 var(--display);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--fg);
+}
+
+.reversi-app .manual-step {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  gap: 9px;
+}
+
+.reversi-app .manual-step>.text {
+  font-family: var(--display);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.reversi-app .manual-step .strong {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.reversi-app .manual-step .p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.9;
+}
+
+.reversi-app .desktop-stones {
+  height: 70px;
+  position: relative;
+  margin: 0 0 24px;
+}
+
+.reversi-app .desktop-stones .stone {
+  position: absolute;
+  width: 50px;
+  top: 8px;
+  left: 14px;
+  transform: rotate(-15deg);
+}
+
+.reversi-app .desktop-stones .stone.white {
+  left: 55px;
+  top: 0;
+}
+
+.reversi-app .desktop-status {
+  margin-top: 22px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.reversi-app .phone {
+  --phone-h: min(844px,calc(100dvh - 42px));
+  height: var(--phone-h);
+  width: 390px;
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+  border: 1px solid rgb(155, 158, 143);
+  border-radius: 26px;
+  box-shadow: 0 22px 55px -20px rgba(32, 26, 11, 0.26),0 0 0 5px rgb(219, 215, 200);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+}
+
+.reversi-app .phone:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  opacity: .045;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.reversi-app .topbar {
+  height: 61px;
+  min-height: 61px;
+  margin: 0 20px;
+  border-bottom: 1px solid var(--fg);
+  display: grid;
+  grid-template-columns: 44px 1fr 94px;
+  align-items: center;
+  gap: 2px;
+  z-index: 2;
+}
+
+.reversi-app .topbar.home-bar {
+  grid-template-columns: 1fr auto;
+}
+
+.reversi-app .wordmark {
+  font-family: var(--display);
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: 0;
+}
+
+.reversi-app .brand-mark {
+  height: 23px;
+  width: 23px;
+  border: 1px solid var(--fg);
+  position: relative;
+  background: linear-gradient(90deg,transparent 48%,var(--fg) 48% 52%,transparent 52%),linear-gradient(transparent 48%,var(--fg) 48% 52%,transparent 52%);
+}
+
+.reversi-app .brand-mark:before, .reversi-app .brand-mark:after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  background: var(--fg);
+}
+
+.reversi-app .brand-mark:after {
+  left: 12px;
+  top: 12px;
+  background: var(--bg);
+  border: 1px solid var(--fg);
+}
+
+.reversi-app .header-title {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.reversi-app .header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.reversi-app .icon-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 3px;
+}
+
+.reversi-app .icon-btn:hover {
+  background: var(--hover);
+}
+
+.reversi-app .capsule {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.reversi-app .capsule .icon-btn {
+  height: 44px;
+  min-width: 44px;
+  padding: 6px;
+}
+
+.reversi-app .capsule .i {
+  height: 13px;
+  border-left: 1px solid var(--border);
+}
+
+.reversi-app .capsule .app-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.reversi-app .viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.reversi-app .viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.reversi-app .screen {
+  display: none;
+}
+
+.reversi-app .screen.active {
+  display: block;
+  animation: page-in .25s ease-out;
+}
+
+.reversi-app .screen:focus, .reversi-app .screen:focus-visible, .reversi-app .screen .h1:focus, .reversi-app .screen .h1:focus-visible {
+  outline: none;
+}
+
+.reversi-app .pad {
+  padding: 20px;
+}
+
+.reversi-app .section-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+.reversi-app .intro {
+  padding: 16px 0 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reversi-app .home-title {
+  font-size: 32px;
+  line-height: 1.38;
+}
+
+.reversi-app .stamp {
+  font-family: var(--display);
+  border: 1px solid var(--accent);
+  color: var(--accent-ink);
+  padding: 5px 4px;
+  writing-mode: vertical-rl;
+  font-size: 12px;
+  letter-spacing: .17em;
+  line-height: 1.3;
+  box-shadow: inset 0 0 0 2px var(--bg),inset 0 0 0 3px rgb(205, 143, 99);
+  transform: rotate(4deg);
+  margin-right: 8px;
+}
+
+.reversi-app .home {
+  padding: 16px 20px 0;
+}
+
+.reversi-app .table-photo {
+  padding: 5px;
+  border: 1px solid rgb(86, 95, 81);
+  background: var(--felt-dark);
+}
+
+.reversi-app .table-photo .image {
+  width: 100%;
+  aspect-ratio: 1100/733;
+  object-fit: contain;
+}
+
+.reversi-app .photo-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.reversi-app .btn {
+  min-height: 48px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  border-radius: 3px;
+  width: 100%;
+  position: relative;
+}
+
+.reversi-app .btn .app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.reversi-app .primary {
+  background: var(--felt);
+  border-color: var(--felt);
+  color: var(--ivory);
+  box-shadow: 0 2px 0 var(--felt-dark);
+}
+
+.reversi-app .primary:hover {
+  background: var(--felt-dark);
+  border-color: var(--felt-dark);
+  color: var(--ivory);
+}
+
+.reversi-app .secondary:hover {
+  background: var(--surface);
+  border-color: var(--fg);
+}
+
+.reversi-app .btn.copied {
+  border-color: var(--felt);
+  color: var(--felt);
+  background: rgb(226, 220, 204);
+}
+
+.reversi-app .btn.copied:hover {
+  background: rgb(216, 212, 195);
+  border-color: var(--felt);
+  color: var(--felt);
+}
+
+.reversi-app .btn .end {
+  position: absolute;
+  right: 15px;
+}
+
+.reversi-app .text-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 7px 4px;
+  font-size: 12px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.reversi-app .text-btn:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.reversi-app .friend-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 4px 0 6px;
+}
+
+.reversi-app .friend-links button+button {
+  position: relative;
+}
+
+.reversi-app .friend-links button+button:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  height: 13px;
+  border-left: 1px solid var(--border);
+}
+
+.reversi-app .record-summary {
+  border-block: 1px solid var(--border);
+  padding: 12px 0 11px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr) 44px;
+  align-items: center;
+}
+
+.reversi-app .record-summary>view {
+  text-align: center;
+}
+
+.reversi-app .record-summary .b {
+  display: block;
+  font: 600 23px/1.2 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
+.reversi-app .record-summary .text {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  letter-spacing: .02em;
+}
+
+.reversi-app .chapter-link {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 35px 1fr 20px;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  min-height: 67px;
+  padding: 10px 0;
+}
+
+.reversi-app .chapter-no {
+  font: 24px/1 var(--display);
+  border-right: 1px solid var(--border);
+  height: 35px;
+  display: grid;
+  align-items: center;
+}
+
+.reversi-app .chapter-link .strong {
+  font: 600 15px/1.5 var(--display);
+}
+
+.reversi-app .chapter-link .small-text {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.reversi-app .bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  min-height: 58px;
+  padding-bottom: env(safe-area-inset-bottom,0px);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  flex: none;
+}
+
+.reversi-app .bottom-nav button {
+  position: relative;
+  min-height: 58px;
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.reversi-app .bottom-nav button .app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.reversi-app .bottom-nav button.active {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.reversi-app .bottom-nav button.active:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.reversi-app .bottom-nav button:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.reversi-app .page-intro {
+  padding: 22px 0 20px;
+}
+
+.reversi-app .page-intro .h1 {
+  font-size: 30px;
+  line-height: 1.4;
+}
+
+.reversi-app .page-intro .p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+
+.reversi-app .eyebrow {
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.reversi-app .mode-option {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px;
+  text-align: left;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 10px;
+  min-height: 86px;
+  transition: background .18s,border-color .18s,box-shadow .18s,transform .16s;
+}
+
+.reversi-app .mode-option:hover {
+  border-color: var(--fg);
+  background: var(--hover);
+}
+
+.reversi-app .mode-option.selected {
+  border-color: var(--felt);
+  box-shadow: inset 0 0 0 1px var(--felt);
+  background: rgb(222, 217, 200);
+}
+
+.reversi-app .mode-option .strong {
+  font: 600 20px/1.4 var(--display);
+  display: block;
+}
+
+.reversi-app .mode-option .small-text {
+  font-size: 11px;
+  display: block;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.reversi-app .mode-check {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--muted);
+  border-radius: 50%;
+  position: relative;
+  flex: none;
+}
+
+.reversi-app .selected .mode-check {
+  border-color: var(--felt);
+}
+
+.reversi-app .selected .mode-check:after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--felt);
+}
+
+.reversi-app .mode-art {
+  width: 47px;
+  height: 45px;
+  position: relative;
+  flex: none;
+}
+
+.reversi-app .mode-art .stone {
+  position: absolute;
+  width: 31px;
+  top: 10px;
+  left: 0;
+}
+
+.reversi-app .mode-art .stone.white {
+  top: 2px;
+  left: 18px;
+}
+
+.reversi-app .ai-symbol {
+  height: 41px;
+  width: 41px;
+  border: 1px solid var(--fg);
+  display: grid;
+  place-items: center;
+  font: 22px var(--display);
+}
+
+.reversi-app .field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin: 19px 0 9px;
+}
+
+.reversi-app .segmented {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  border: 1px solid var(--border);
+  padding: 3px;
+  gap: 3px;
+}
+
+.reversi-app .segmented.triple {
+  grid-template-columns: repeat(3,1fr);
+}
+
+.reversi-app .segmented button {
+  min-height: 44px;
+  font-size: 12px;
+}
+
+.reversi-app .segmented button[aria-checked="true"] {
+  background: var(--fg);
+  color: var(--ivory);
+}
+
+.reversi-app .segmented button:hover:not([aria-checked="true"]) {
+  background: var(--hover);
+}
+
+.reversi-app .segmented button:focus-visible {
+  outline-offset: -2px;
+  outline-color: var(--accent);
+}
+
+.reversi-app .help-copy {
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin: 9px 0 20px;
+}
+
+.reversi-app .mode-footer {
+  margin-top: 22px;
+}
+
+.reversi-app .mode-footer .text-btn {
+  width: 100%;
+}
+
+.reversi-app .stone {
+  display: inline-block;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  position: relative;
+  flex: none;
+  background: radial-gradient(ellipse at 35% 25%,rgb(54, 64, 59),var(--black) 56%,rgb(2, 4, 3) 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3),inset 0 -3px 3px rgba(0, 0, 0, 0.6),0 3px 2px rgba(0, 9, 4, 0.4),0 6px 7px rgba(0, 9, 4, 0.15);
+}
+
+.reversi-app .stone.white {
+  background: radial-gradient(ellipse at 34% 24%,var(--white),var(--ivory) 50%,rgb(207, 195, 167) 100%);
+  box-shadow: inset 0 1px 2px var(--white),inset 0 -3px 2px rgba(159, 148, 122, 0.45),0 3px 2px rgba(0, 9, 4, 0.35),0 6px 7px rgba(0, 9, 4, 0.1);
+}
+
+.reversi-app .stone:before {
+  content: "";
+  position: absolute;
+  top: 13%;
+  left: 20%;
+  width: 44%;
+  height: 13%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(-24deg);
+}
+
+.reversi-app .stone.white:before {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.reversi-app .match {
+  padding: 13px 16px max(6px,env(safe-area-inset-bottom,0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  min-height: 100%;
+}
+
+.reversi-app .players {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 33px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.reversi-app .player {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+  padding: 5px 0;
+}
+
+.reversi-app .player .stone {
+  width: 28px;
+}
+
+.reversi-app .player-name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.reversi-app .player-name .small-text {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.reversi-app .player-score {
+  font: 600 27px/1.2 var(--display);
+  position: absolute;
+  right: 0;
+  top: 5px;
+}
+
+.reversi-app .player.right {
+  padding-right: 0;
+  grid-template-columns: 1fr 32px;
+  text-align: right;
+}
+
+.reversi-app .player.right .player-score {
+  right: auto;
+  left: 0;
+}
+
+.reversi-app .player.right .player-name {
+  padding-right: 5px;
+}
+
+.reversi-app .player.left .player-name {
+  padding-right: 26px;
+}
+
+.reversi-app .player.right .player-name {
+  padding-left: 26px;
+}
+
+.reversi-app .vs {
+  font: 12px var(--display);
+  color: var(--muted);
+  text-align: center;
+}
+
+.reversi-app .turn-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  width: 100%;
+  font-size: 11px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+.reversi-app .turn-line .strong {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reversi-app .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--felt);
+  display: inline-block;
+  flex: none;
+}
+
+.reversi-app .status-dot.wait {
+  background: var(--brass);
+}
+
+.reversi-app .status-dot.offline {
+  background: var(--accent);
+}
+
+.reversi-app .turn-meta {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.reversi-app .board-frame {
+  width: min(100%,max(220px,calc(var(--phone-h) - 353px)));
+  padding: 10px 10px 10px 18px;
+  position: relative;
+  border: 2px solid var(--wood-dark);
+  border-radius: 4px;
+  background: repeating-linear-gradient(3deg,rgba(32, 15, 1, 0.2) 0 1px,transparent 1px 5px),linear-gradient(100deg,var(--wood),var(--brass) 48%,var(--wood));
+  box-shadow: inset 0 0 0 1px rgb(161, 118, 63),0 4px 0 var(--wood-dark),0 10px 19px -8px rgba(7, 26, 19, 0.4);
+  margin: 2px auto 4px;
+  flex: none;
+}
+
+.reversi-app .board {
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8,minmax(0,1fr));
+  grid-template-rows: repeat(8,minmax(0,1fr));
+  position: relative;
+  background-color: var(--felt);
+  background-image: linear-gradient(90deg,rgba(5, 19, 13, 0.42) 1px,transparent 1px),linear-gradient(rgba(5, 19, 13, 0.42) 1px,transparent 1px),var(--grain);
+  background-size: 12.5% 12.5%,12.5% 12.5%,70px 70px;
+  border: 1px solid var(--felt-dark);
+  box-shadow: inset 0 0 16px rgba(0, 13, 7, 0.22);
+}
+
+.reversi-app .board-labels {
+  position: absolute;
+  left: 18px;
+  right: 10px;
+  top: -1px;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  font: 7px/9px var(--mono);
+  color: var(--ivory);
+  background: var(--wood-dark);
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.reversi-app .board-ranks {
+  position: absolute;
+  left: 2px;
+  top: 10px;
+  bottom: 10px;
+  display: grid;
+  grid-template-rows: repeat(8,1fr);
+  font: 7px var(--mono);
+  align-items: center;
+  color: var(--ivory);
+  background: var(--wood-dark);
+  width: 10px;
+  text-align: center;
+}
+
+.reversi-app .cell {
+  padding: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 0;
+  min-width: 0;
+  min-height: 0;
+  opacity: 1!important;
+  cursor: default;
+  outline-offset: -2px!important;
+}
+
+.reversi-app .cell.legal {
+  cursor: pointer;
+}
+
+.reversi-app .cell.legal:after {
+  content: "";
+  width: 15%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 0 0 3px rgba(187, 146, 80, 0.12);
+}
+
+.reversi-app .cell.legal:hover {
+  background: var(--felt-dark);
+}
+
+.reversi-app .cell.legal:active {
+  transform: none;
+  background: var(--felt-dark);
+  box-shadow: inset 0 0 0 1px var(--brass);
+}
+
+.reversi-app .cell:focus-visible {
+  z-index: 5;
+  outline-color: var(--ivory);
+}
+
+.reversi-app .cell .stone {
+  width: 78%;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.reversi-app .cell.last .stone:after {
+  content: "末";
+  position: absolute;
+  right: -4%;
+  bottom: 0;
+  width: 32%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--accent);
+  background: var(--ivory);
+  color: var(--accent-ink);
+  font: 600 7px/1 var(--display);
+  box-shadow: 0 1px 2px rgba(3, 3, 3, 0.2);
+}
+
+.reversi-app .cell.suggested {
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+.reversi-app #board {
+  --preview: var(--black);
+}
+
+.reversi-app #board[data-turn="2"] {
+  --preview: var(--ivory);
+}
+
+.reversi-app .cell.legal:before {
+  content: "";
+  position: absolute;
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 36% 26%,rgba(255, 255, 255, 0.22),transparent 62%),var(--preview);
+  opacity: 0;
+  box-shadow: 0 3px 5px rgba(0, 5, 2, 0.3);
+  pointer-events: none;
+  transition: opacity .14s;
+}
+
+.reversi-app .cell.legal:after {
+  transition: opacity .12s;
+}
+
+@media(hover:hover) {
+  .reversi-app .cell.legal:hover:before {
+    opacity: .52;
+  }
+
+  .reversi-app .cell.legal:hover:after {
+    opacity: 0;
+  }
+}
+
+.reversi-app .cell.legal:focus-visible:before {
+  opacity: .3;
+}
+
+.reversi-app .cell.legal:focus-visible:after {
+  opacity: 0;
+}
+
+.reversi-app .cell .stone.drop {
+  animation: stone-drop .32s cubic-bezier(.2,.85,.2,1.25) both;
+}
+
+.reversi-app .cell .stone.flip {
+  animation: stone-flip .46s ease-in-out both;
+}
+
+.reversi-app .blast {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  --blast-color: var(--brass);
+}
+
+.reversi-app .blast.bomb {
+  --blast-color: var(--accent);
+}
+
+.reversi-app .blast-center {
+  position: absolute;
+  left: calc(var(--x)*12.5% + 6.25%);
+  top: calc(var(--y)*12.5% + 6.25%);
+  width: 10%;
+  aspect-ratio: 1;
+  transform: translate(-50%,-50%);
+  border: 2px solid var(--blast-color);
+  border-radius: 50%;
+  animation: ring .65s ease-out both;
+}
+
+.reversi-app .blast.bomb .blast-center:before, .reversi-app .blast.bomb .blast-center:after {
+  content: "";
+  position: absolute;
+  background: var(--blast-color);
+  box-shadow: 0 0 8px rgba(185, 77, 53, 0.45);
+}
+
+.reversi-app .blast.bomb .blast-center:before {
+  width: 380%;
+  height: 2px;
+  left: -140%;
+  top: calc(50% - 1px);
+}
+
+.reversi-app .blast.bomb .blast-center:after {
+  height: 380%;
+  width: 2px;
+  top: -140%;
+  left: calc(50% - 1px);
+}
+
+.reversi-app .blast.bomb .blast-center {
+  animation: bomb-ring .8s ease-out both;
+}
+
+.reversi-app .board-caption {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+  min-height: 17px;
+}
+
+.reversi-app .sound-indicator {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.reversi-app .sound-indicator .i {
+  width: 2px;
+  height: 5px;
+  background: var(--felt);
+}
+
+.reversi-app .sound-indicator.playing .i {
+  animation: sound-wave .2s ease-in-out 3 alternate;
+}
+
+.reversi-app .sound-indicator .i:nth-child(2) {
+  height: 9px;
+  animation-delay: .06s;
+}
+
+.reversi-app .sound-indicator .i:nth-child(3) {
+  height: 6px;
+  animation-delay: .12s;
+}
+
+.reversi-app .energy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-block: 1px solid var(--border);
+  padding: 9px 0;
+  font-size: 11px;
+  gap: 8px;
+}
+
+.reversi-app .energy-pips {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.reversi-app .energy-pips .i {
+  width: 14px;
+  height: 6px;
+  border: 1px solid var(--border);
+}
+
+.reversi-app .energy-pips .i.full {
+  background: var(--brass);
+  border-color: rgb(124, 119, 65);
+}
+
+.reversi-app .energy-value {
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.reversi-app .skill-controls {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  width: 100%;
+  gap: 9px;
+  align-items: center;
+}
+
+.reversi-app .equipped-skill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 4px;
+  text-align: left;
+}
+
+.reversi-app .skill-symbol {
+  height: 34px;
+  width: 34px;
+  border: 1px solid var(--fg);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.reversi-app .skill-symbol .app-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.reversi-app .equipped-skill .strong {
+  display: block;
+  font: 600 15px/1.4 var(--display);
+}
+
+.reversi-app .equipped-skill .small-text {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.reversi-app .skill-controls .btn {
+  font-size: 12px;
+  min-height: 44px;
+  padding: 8px;
+}
+
+.reversi-app .skill-controls .btn.armed {
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+  color: var(--ivory);
+}
+
+.reversi-app .game-tools {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.reversi-app .game-tools .text-btn {
+  font-size: 11px;
+  padding-inline: 6px;
+}
+
+.reversi-app .game-tools .text-btn .app-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.reversi-app .game-toast {
+  font-size: 11px;
+  text-align: center;
+  min-height: 18px;
+  color: var(--muted);
+  width: 100%;
+}
+
+.reversi-app .classic-note {
+  font-size: 12px;
+  text-align: center;
+  padding: 14px 8px;
+  border-block: 1px solid var(--border);
+  width: 100%;
+}
+
+.reversi-app .connection-line {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reversi-app .room-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 22px;
+}
+
+.reversi-app .room-intro .h1 {
+  font-size: 32px;
+  line-height: 1.4;
+}
+
+.reversi-app .room-paper {
+  border: 1px solid var(--fg);
+  padding: 18px 14px;
+  text-align: center;
+  position: relative;
+}
+
+.reversi-app .room-paper:before, .reversi-app .room-paper:after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--fg);
+  background: var(--bg);
+  top: -4px;
+}
+
+.reversi-app .room-paper:before {
+  left: -4px;
+}
+
+.reversi-app .room-paper:after {
+  right: -4px;
+}
+
+.reversi-app .room-code {
+  font: 600 35px/1.3 var(--display);
+  letter-spacing: .17em;
+  padding-left: .17em;
+  margin: 10px 0 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.reversi-app .seats {
+  display: grid;
+  grid-template-columns: 1fr 45px 1fr;
+  align-items: center;
+  padding: 30px 14px 21px;
+}
+
+.reversi-app .seat {
+  text-align: center;
+}
+
+.reversi-app .seat .stone {
+  width: 47px;
+  margin-bottom: 10px;
+}
+
+.reversi-app .seat.waiting .stone {
+  background: none;
+  border: 1px dashed var(--muted);
+  box-shadow: none;
+}
+
+.reversi-app .seat.waiting .stone:before {
+  display: none;
+}
+
+.reversi-app .seat .strong {
+  display: block;
+  font: 600 16px/1.5 var(--display);
+}
+
+.reversi-app .seat .small-text {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.reversi-app .seat-divider {
+  border-top: 1px dashed var(--border);
+  margin-bottom: 32px;
+}
+
+.reversi-app .room-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  padding: 0 0 22px;
+}
+
+.reversi-app .room-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reversi-app .room-note {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-top: 17px;
+}
+
+.reversi-app .room-note .b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.reversi-app .join-digits {
+  position: relative;
+  margin: 22px 0 9px;
+  height: 54px;
+}
+
+.reversi-app .digit-boxes {
+  display: grid;
+  grid-template-columns: repeat(6,minmax(0,1fr));
+  gap: 7px;
+  height: 100%;
+  pointer-events: none;
+}
+
+.reversi-app .digit-boxes .text {
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--fg);
+  display: grid;
+  place-items: center;
+  font: 27px var(--display);
+}
+
+.reversi-app .digit-boxes .text.next {
+  border-bottom-color: var(--accent);
+  background: var(--surface);
+}
+
+.reversi-app .join-digits input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: transparent;
+  caret-color: transparent;
+  background: transparent;
+  border: 0;
+  letter-spacing: .2em;
+  outline-offset: 5px;
+}
+
+.reversi-app .join-error {
+  font-size: 11px;
+  min-height: 38px;
+  color: var(--accent-ink);
+  line-height: 1.7;
+}
+
+.reversi-app .join-error.pending {
+  color: var(--muted);
+}
+
+.reversi-app .keypad {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  margin: 15px 0 20px;
+}
+
+.reversi-app .keypad button {
+  min-height: 57px;
+  background: rgb(239, 234, 220);
+  border: 1px solid var(--border);
+  font: 24px/1 var(--display);
+  border-radius: 3px;
+}
+
+.reversi-app .keypad button:hover {
+  background: var(--surface);
+  border-color: var(--fg);
+}
+
+.reversi-app .keypad button.word {
+  font: 12px var(--body);
+  background: transparent;
+}
+
+.reversi-app .keypad button:active {
+  background: var(--surface);
+  border-color: var(--fg);
+}
+
+.reversi-app .chapter-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+  border-top: 1px solid var(--fg);
+}
+
+.reversi-app .chapter-list .list-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.reversi-app .chapter-card {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 35px 1fr 20px;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  min-height: 95px;
+  padding: 14px 0;
+}
+
+.reversi-app .chapter-card>.text {
+  font: 26px var(--display);
+}
+
+.reversi-app .chapter-card .strong {
+  font: 600 18px var(--display);
+}
+
+.reversi-app .chapter-card .p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.reversi-app .chapter-card[aria-disabled="true"] {
+  opacity: .55;
+}
+
+.reversi-app .record-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--fg);
+}
+
+.reversi-app .record-item {
+  width: 100%;
+  padding: 16px 0;
+  display: grid;
+  grid-template-columns: 35px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.reversi-app .record-seal {
+  font: 18px var(--display);
+  width: 29px;
+  height: 33px;
+  border: 1px solid var(--fg);
+  display: grid;
+  place-items: center;
+  transition: border-color .18s,background .18s;
+}
+
+.reversi-app .record-item:hover .record-seal, .reversi-app .record-item:focus-visible .record-seal {
+  border-color: var(--accent);
+  background: rgb(228, 218, 198);
+}
+
+.reversi-app .record-item .small-text {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.reversi-app .record-item .b {
+  font: 23px var(--display);
+}
+
+.reversi-app .empty-state {
+  padding: 60px 12px;
+  text-align: center;
+}
+
+.reversi-app .empty-stones {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 30px;
+}
+
+.reversi-app .empty-stones .stone {
+  width: 34px;
+}
+
+.reversi-app .empty-state .h2 {
+  font-size: 23px;
+}
+
+.reversi-app .empty-state .p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 14px 0 26px;
+}
+
+.reversi-app .scorecard {
+  border: 1px solid var(--fg);
+  padding: 20px;
+  margin: 3px 0 19px;
+  background: var(--surface);
+  position: relative;
+}
+
+.reversi-app .scorecard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.reversi-app .scorecard-header .stamp {
+  font-size: 16px;
+  writing-mode: horizontal-tb;
+  padding: 4px 8px;
+  margin: 0;
+}
+
+.reversi-app .result-title {
+  text-align: center;
+  font-size: 29px;
+  margin: 24px 0 16px;
+}
+
+.reversi-app .result-scores {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  text-align: center;
+  align-items: center;
+}
+
+.reversi-app .result-scores .b {
+  font: 600 45px/1.1 var(--display);
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+
+.reversi-app .result-scores .small-text {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 7px;
+}
+
+.reversi-app .result-board {
+  width: 146px;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  aspect-ratio: 1;
+  padding: 4px;
+  background: var(--felt);
+  margin: 20px auto;
+  gap: 1px;
+}
+
+.reversi-app .result-board .text {
+  display: grid;
+  place-items: center;
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.reversi-app .result-board .stone {
+  width: 80%;
+  box-shadow: none;
+}
+
+.reversi-app .result-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 11px;
+}
+
+.reversi-app .result-foot {
+  text-align: center;
+  font: 13px/1.8 var(--display);
+  margin-top: 15px;
+}
+
+.reversi-app .two-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.reversi-app .two-actions .btn {
+  font-size: 12px;
+}
+
+.reversi-app .review-board {
+  pointer-events: none;
+}
+
+.reversi-app .sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 13, 7, 0.48);
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  backdrop-filter: blur(2px);
+  transition: opacity .18s ease;
+}
+
+.reversi-app .sheet-overlay.is-closing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reversi-app .sheet {
+  width: 100%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  border-top: 1px solid var(--fg);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -12px 35px rgba(0, 9, 4, 0.14);
+  padding: 9px 22px max(20px,env(safe-area-inset-bottom));
+  animation: sheet-in .24s ease-out;
+}
+
+.reversi-app .sheet-handle {
+  width: 44px;
+  height: 14px;
+  margin: -4px auto 0;
+  position: relative;
+  flex: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.reversi-app .sheet-handle:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.reversi-app .sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex: none;
+  touch-action: none;
+}
+
+.reversi-app .sheet-head .h2 {
+  font-size: 24px;
+}
+
+.reversi-app .sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.reversi-app .sheet-body::-webkit-scrollbar {
+  display: none;
+}
+
+.reversi-app .sheet-body>.p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+
+.reversi-app .settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  min-height: 67px;
+  border-bottom: 1px solid var(--border);
+}
+
+.reversi-app .settings-row .strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reversi-app .settings-row .small-text {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.reversi-app .toggle {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.reversi-app .toggle .text {
+  width: 38px;
+  height: 22px;
+  border: 1px solid var(--muted);
+  background: rgb(206, 203, 187);
+  border-radius: 20px;
+  position: relative;
+  transition: background .18s,border-color .18s;
+}
+
+.reversi-app .toggle:hover .text {
+  border-color: var(--fg);
+}
+
+.reversi-app .toggle .text:after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: transform .2s;
+}
+
+.reversi-app .toggle[aria-checked="true"] .text {
+  background: var(--felt);
+  border-color: var(--felt);
+}
+
+.reversi-app .toggle[aria-checked="true"] .text:after {
+  transform: translateX(16px);
+}
+
+.reversi-app .volume-control {
+  padding: 20px 0 15px;
+}
+
+.reversi-app .volume-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.reversi-app .volume-control input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--felt);
+  cursor: pointer;
+}
+
+.reversi-app .volume-control input[disabled] {
+  opacity: .4;
+}
+
+.reversi-app .setting-note {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.reversi-app .skill-card {
+  width: 100%;
+  min-height: 79px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 11px 0;
+}
+
+.reversi-app .skill-card:last-of-type {
+  border-bottom: 1px solid var(--border);
+}
+
+.reversi-app .skill-card .strong {
+  font: 600 17px var(--display);
+  display: block;
+}
+
+.reversi-app .skill-card .small-text {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.reversi-app .skill-card .skill-symbol {
+  width: 37px;
+  height: 37px;
+}
+
+.reversi-app .skill-card .skill-arrow {
+  margin-left: auto;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.reversi-app .skill-description {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin: 14px 0 18px;
+}
+
+.reversi-app .skill-demo {
+  width: 130px;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  background: var(--felt);
+  padding: 7px;
+  gap: 1px;
+  margin: 16px auto 10px;
+  position: relative;
+}
+
+.reversi-app .skill-demo>.text {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+}
+
+.reversi-app .skill-demo .stone {
+  width: 72%;
+}
+
+.reversi-app .skill-demo .target {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.reversi-app .skill-demo .target .stone {
+  outline: 1px solid var(--brass);
+}
+
+.reversi-app .skill-detail-line {
+  display: flex;
+  justify-content: space-between;
+  border-block: 1px solid var(--border);
+  padding: 10px 0;
+  font-size: 11px;
+  margin-bottom: 16px;
+}
+
+.reversi-app .share-preview {
+  border: 1px solid var(--fg);
+  margin: 19px 0;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 13px;
+  align-items: center;
+  background: var(--surface);
+}
+
+.reversi-app .share-preview .image {
+  width: 80px;
+  height: auto;
+  aspect-ratio: 1100/733;
+  object-fit: contain;
+}
+
+.reversi-app .share-preview .strong {
+  font: 600 17px/1.5 var(--display);
+}
+
+.reversi-app .share-preview .small-text {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 6px;
+}
+
+.reversi-app .honest-note {
+  padding: 12px 0 17px;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.reversi-app .honest-note .strong {
+  display: block;
+  color: var(--fg);
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.reversi-app .rules-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: rules;
+}
+
+.reversi-app .rules-steps .list-item {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.reversi-app .rules-steps .list-item:before {
+  counter-increment: rules;
+  content: "0" counter(rules);
+  font-family: var(--display);
+  color: var(--muted);
+  min-width: 20px;
+}
+
+.reversi-app .move-log {
+  padding-left: 23px;
+  font-size: 12px;
+  line-height: 2.2;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.reversi-app .move-log .text {
+  color: var(--muted);
+  margin-left: 12px;
+}
+
+.reversi-app .replay-board {
+  width: min(100%,288px);
+  aspect-ratio: 1;
+  margin: 0 auto 13px;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  gap: 1px;
+  padding: 6px;
+  background: linear-gradient(100deg,var(--wood),var(--brass) 48%,var(--wood));
+  border: 1px solid var(--wood-dark);
+  border-radius: 3px;
+  box-shadow: 0 6px 16px -11px rgba(7, 26, 19, 0.55);
+}
+
+.reversi-app .replay-board>.text {
+  display: grid;
+  place-items: center;
+  background: var(--felt);
+  outline: 1px solid rgba(0, 0, 0, 0.13);
+  position: relative;
+}
+
+.reversi-app .replay-board>.text.last {
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+.reversi-app .replay-board .stone {
+  width: 78%;
+  pointer-events: none;
+}
+
+.reversi-app .replay-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 9px;
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  padding: 12px 0 2px;
+}
+
+.reversi-app .replay-status .strong {
+  font: 600 15px var(--display);
+  white-space: nowrap;
+}
+
+.reversi-app .replay-status .text {
+  color: var(--muted);
+}
+
+.reversi-app .replay-status .replay-score {
+  margin-left: auto;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.reversi-app .replay-range {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  accent-color: var(--felt);
+  cursor: pointer;
+}
+
+.reversi-app .replay-steps {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 6px;
+  margin: 0 0 4px;
+}
+
+.reversi-app .replay-steps .btn {
+  min-height: 44px;
+  padding: 6px 2px;
+  font-size: 12px;
+}
+
+.reversi-app .replay-steps .btn[aria-disabled="true"] {
+  opacity: .45;
+  cursor: default;
+}
+
+.reversi-app .replay-steps .btn[aria-disabled="true"]:hover {
+  background: none;
+  border-color: var(--border);
+}
+
+.reversi-app .replay-log-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding: 12px 0 4px;
+}
+
+.reversi-app .replay-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 154px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  scrollbar-width: none;
+}
+
+.reversi-app .replay-log::-webkit-scrollbar {
+  display: none;
+}
+
+.reversi-app .replay-log .list-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.reversi-app .replay-log button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-align: left;
+  padding: 8px 7px;
+  font-size: 12px;
+  color: var(--fg);
+}
+
+@media(hover:hover) {
+  .reversi-app .replay-log button:hover {
+    background: var(--hover);
+  }
+}
+
+.reversi-app .replay-log button[aria-current="true"] {
+  background: var(--hover);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.reversi-app .replay-log .no {
+  font: 10px var(--mono);
+  color: var(--muted);
+  min-width: 20px;
+}
+
+.reversi-app .replay-log .mv {
+  font-weight: 600;
+}
+
+.reversi-app .replay-log .fl {
+  margin-left: auto;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@media(max-height:680px) {
+  .reversi-app .replay-board {
+    width: min(100%,212px);
+  }
+}
+
+.reversi-app .toast {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 80px;
+  z-index: 50;
+  background: var(--fg);
+  color: var(--ivory);
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 12px;
+  border: 1px solid rgb(62, 74, 65);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .2s,transform .2s;
+  pointer-events: none;
+}
+
+.reversi-app .toast.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reversi-app.effects-off .blast {
+  display: none;
+}
+
+.reversi-app.effects-off .stone, .reversi-app.effects-off .screen, .reversi-app.effects-off .sheet {
+  animation: none!important;
+  transition: none!important;
+}
+
+@keyframes page-in {
+  from {
+    opacity: .45;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(30px);
+    opacity: .5;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes stone-drop {
+  0% {
+    transform: translateY(-11px) scale(1.14);
+    opacity: 0;
+  }
+
+  70% {
+    transform: translateY(1px) scale(.96);
+    opacity: 1;
+  }
+
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes stone-flip {
+  0% {
+    transform: perspective(200px) rotateX(0);
+    background: var(--old-fill);
+  }
+
+  49% {
+    transform: perspective(200px) rotateX(89deg);
+    background: var(--old-fill);
+  }
+
+  50% {
+    transform: perspective(200px) rotateX(91deg);
+  }
+
+  100% {
+    transform: perspective(200px) rotateX(180deg);
+  }
+}
+
+@keyframes ring {
+  0% {
+    opacity: .85;
+    scale: .4;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 2.1;
+  }
+}
+
+@keyframes bomb-ring {
+  0% {
+    opacity: 1;
+    scale: .4;
+  }
+
+  35% {
+    opacity: .9;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 2.7;
+  }
+}
+
+@keyframes sound-wave {
+  from {
+    transform: scaleY(.4);
+  }
+
+  to {
+    transform: scaleY(1.3);
+  }
+}
+
+/* #ifdef H5 */
+@container(max-width:350px) {
+  .reversi-app .home {
+    padding: 12px 16px 0;
+  }
+
+  .reversi-app .home-title {
+    font-size: 28px;
+  }
+
+  .reversi-app .intro {
+    padding: 12px 0;
+  }
+
+  .reversi-app .home .photo-caption {
+    font-size: 10px;
+  }
+
+  .reversi-app .player-score {
+    font-size: 23px;
+  }
+
+  .reversi-app .player-name {
+    font-size: 11px;
+  }
+
+  .reversi-app .pad {
+    padding: 16px;
+  }
+
+  .reversi-app .room-code {
+    font-size: 30px;
+  }
+
+  .reversi-app .join-digits {
+    margin-top: 15px;
+  }
+
+  .reversi-app .keypad button {
+    min-height: 48px;
+  }
+
+  .reversi-app .keypad {
+    gap: 6px;
+    margin: 10px 0 15px;
+  }
+
+  .reversi-app .chapter-card .strong {
+    font-size: 16px;
+  }
+
+  .reversi-app .sheet {
+    padding-inline: 17px;
+  }
+
+  .reversi-app .header-title {
+    font-size: 16px;
+  }
+}
+/* #endif */
+
+@media(min-width:1100px) {
+  .reversi-app .home .intro {
+    padding-top: 15px;
+  }
+
+  .reversi-app .viewport {
+    scrollbar-width: none;
+  }
+}
+
+@media(max-width:1099px) {
+  .reversi-app .desk {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .reversi-app .margin-note {
+    display: none;
+  }
+
+  .reversi-app .desk:before {
+    display: none;
+  }
+}
+
+@media(max-width:600px) {
+  .reversi-app .phone {
+    --phone-h: 100dvh;
+    width: min(100%,430px);
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .reversi-app .desk {
+    height: 100dvh;
+  }
+
+  .reversi-app .topbar {
+    padding-top: env(safe-area-inset-top,0px);
+    height: calc(61px + env(safe-area-inset-top,0px));
+    min-height: calc(61px + env(safe-area-inset-top,0px));
+  }
+
+  .reversi-app .phone .board-frame {
+    width: min(100%,max(220px,calc(var(--phone-h) - 353px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))));
+  }
+}
+
+@media(max-height:730px) {
+  .reversi-app .home .table-photo .image {
+    max-height: 174px;
+    width: auto;
+    margin: auto;
+  }
+
+  .reversi-app .home .intro {
+    padding: 9px 0;
+  }
+
+  .reversi-app .home .photo-caption {
+    padding-bottom: 8px;
+  }
+
+  .reversi-app .home .record-summary {
+    padding-block: 8px;
+  }
+
+  .reversi-app .home .chapter-link {
+    min-height: 57px;
+  }
+
+  .reversi-app .page-intro {
+    padding-top: 10px;
+    padding-bottom: 15px;
+  }
+
+  .reversi-app .page-intro .h1 {
+    font-size: 27px;
+  }
+
+  .reversi-app .mode-option {
+    min-height: 74px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .reversi-app .mode-option .strong {
+    font-size: 18px;
+  }
+
+  .reversi-app .mode-footer {
+    margin-top: 14px;
+  }
+
+  .reversi-app .field-label {
+    margin-top: 12px;
+  }
+
+  .reversi-app .room-intro {
+    padding-bottom: 15px;
+  }
+
+  .reversi-app .room-intro .h1 {
+    font-size: 28px;
+  }
+
+  .reversi-app .room-paper {
+    padding: 12px;
+  }
+
+  .reversi-app .seats {
+    padding-top: 20px;
+    padding-bottom: 14px;
+  }
+
+  .reversi-app .seat .stone {
+    width: 38px;
+    margin-bottom: 6px;
+  }
+
+  .reversi-app .room-status {
+    padding-bottom: 14px;
+  }
+
+  .reversi-app .room-note {
+    margin-top: 12px;
+  }
+
+  .reversi-app .scorecard {
+    padding: 14px;
+  }
+
+  .reversi-app .result-title {
+    font-size: 25px;
+    margin: 15px 0;
+  }
+
+  .reversi-app .result-board {
+    width: 114px;
+    margin-block: 14px;
+  }
+
+  .reversi-app .match {
+    padding: 9px 14px max(3px,env(safe-area-inset-bottom,0px));
+    gap: 5px;
+  }
+
+  .reversi-app .topbar {
+    height: calc(53px + env(safe-area-inset-top,0px));
+    min-height: calc(53px + env(safe-area-inset-top,0px));
+  }
+
+  .reversi-app .board-frame, .reversi-app .phone .board-frame {
+    width: min(100%,max(220px,calc(var(--phone-h) - 322px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))));
+  }
+
+  .reversi-app .players {
+    gap: 7px;
+  }
+
+  .reversi-app .player {
+    padding-block: 4px;
+  }
+
+  .reversi-app .player .stone {
+    width: 24px;
+  }
+
+  .reversi-app .player-name .small-text {
+    font-size: 9px;
+  }
+
+  .reversi-app .turn-line {
+    min-height: 23px;
+    padding-top: 4px;
+  }
+
+  .reversi-app .energy-row {
+    padding-block: 6px;
+  }
+
+  .reversi-app .equipped-skill {
+    min-height: 45px;
+  }
+
+  .reversi-app .skill-controls .btn {
+    min-height: 44px;
+  }
+
+  .reversi-app .game-toast {
+    min-height: 16px;
+    font-size: 10px;
+  }
+
+  .reversi-app .board-caption {
+    min-height: 15px;
+  }
+
+  .reversi-app .game-tools .text-btn {
+    min-height: 44px;
+  }
+
+  .reversi-app .result-scores .b {
+    font-size: 38px;
+  }
+}
+
+@media(max-height:600px) {
+  .reversi-app .home .table-photo .image {
+    max-height: 142px;
+  }
+
+  .reversi-app .home-title {
+    font-size: 27px;
+  }
+
+  .reversi-app .home {
+    padding-top: 10px;
+  }
+
+  .reversi-app .home .intro {
+    padding-block: 7px;
+  }
+
+  .reversi-app .record-summary .b {
+    font-size: 21px;
+  }
+
+  .reversi-app .page-intro .h1 {
+    font-size: 25px;
+  }
+
+  .reversi-app .room-intro .h1 {
+    font-size: 26px;
+  }
+
+  .reversi-app .room-code {
+    font-size: 28px;
+  }
+
+  .reversi-app .room-note {
+    font-size: 10px;
+  }
+
+  .reversi-app .seats {
+    padding-block: 14px;
+  }
+
+  .reversi-app .keypad button {
+    min-height: 44px;
+  }
+
+  .reversi-app .keypad {
+    gap: 5px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  .reversi-app .join-digits {
+    margin-top: 10px;
+    height: 46px;
+  }
+
+  .reversi-app .join-error {
+    min-height: 28px;
+  }
+
+  .reversi-app .pad {
+    padding-top: 13px;
+  }
+
+  .reversi-app .sheet {
+    max-height: 94%;
+  }
+
+  .reversi-app .scorecard {
+    margin-bottom: 13px;
+  }
+
+  .reversi-app .result-title {
+    font-size: 23px;
+    margin: 10px 0;
+  }
+
+  .reversi-app .result-board {
+    width: 96px;
+    margin-block: 12px;
+  }
+}
+
+@media(hover:none) {
+  .reversi-app .icon-btn:hover, .reversi-app .text-btn:hover, .reversi-app .segmented button:hover, .reversi-app .bottom-nav button:hover {
+    background: none;
+  }
+
+  .reversi-app .mode-option:hover:not(.selected) {
+    border-color: var(--border);
+    background: none;
+  }
+
+  .reversi-app .record-item:hover .record-seal {
+    border-color: var(--fg);
+    background: none;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .reversi-app view, .reversi-app text, .reversi-app button, .reversi-app image, .reversi-app scroll-view, .reversi-app input, .reversi-app view::before, .reversi-app text::before, .reversi-app button::before, .reversi-app image::before, .reversi-app scroll-view::before, .reversi-app input::before, .reversi-app view::after, .reversi-app text::after, .reversi-app button::after, .reversi-app image::after, .reversi-app scroll-view::after, .reversi-app input::after {
+    animation: none!important;
+    transition: none!important;
+    scroll-behavior: auto!important;
+  }
+
+  .reversi-app .blast-center {
+    opacity: .8;
+  }
+
+  .reversi-app .sound-indicator .i {
+    transform: none!important;
+  }
+}
+
+.reversi-app .statusbar {
+  height: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 8px;
+  font: 600 15px/1 var(--body);
+  letter-spacing: .01em;
+  position: relative;
+  z-index: 40;
+  background: var(--bg);
+}
+
+.reversi-app .status-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.reversi-app .status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--fg);
+}
+
+.reversi-app .status-icons .app-icon {
+  height: 12px;
+  width: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+}
+
+.reversi-app .status-icons .app-icon:nth-child(1) {
+  width: 14px;
+}
+
+.reversi-app .status-icons .app-icon:nth-child(2) {
+  width: 16px;
+}
+
+.reversi-app .status-icons .app-icon:nth-child(3) {
+  width: 24px;
+}
+
+.reversi-app .topbar {
+  height: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  border-bottom: .5px solid var(--border);
+  display: grid;
+  grid-template-columns: 92px 1fr 92px;
+  align-items: center;
+  gap: 0;
+  background: var(--bg);
+  z-index: 4;
+}
+
+.reversi-app .topbar.home-bar {
+  grid-template-columns: 92px 1fr 92px;
+}
+
+.reversi-app .nav-back {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  width: 44px;
+  height: 44px;
+  margin-left: 2px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--fg);
+}
+
+.reversi-app .nav-back[hidden] {
+  display: none;
+}
+
+.reversi-app .nav-back .app-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+}
+
+.reversi-app .nav-title {
+  grid-column: 2;
+  grid-row: 1;
+  font: 600 17px/1.3 var(--body);
+  letter-spacing: .01em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
+}
+
+.reversi-app .capsule {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border: 1px solid rgba(29, 43, 37, 0.16);
+  border-radius: 16px;
+  background: rgba(242, 236, 224, 0.76);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.reversi-app .capsule button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--fg);
+  border-radius: 16px;
+}
+
+.reversi-app .capsule button .app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.reversi-app .capsule .i {
+  height: 17px;
+  border-left: 1px solid rgba(29, 43, 37, 0.14);
+}
+
+@media(hover:hover) {
+  .reversi-app .nav-back:hover, .reversi-app .capsule button:hover {
+    background: var(--hover);
+  }
+}
+
+.reversi-app .bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  min-height: 52px;
+  padding: 0 0 20px;
+  border-top: .5px solid var(--border);
+  background: var(--surface);
+  flex: none;
+  position: relative;
+  z-index: 5;
+}
+
+.reversi-app .bottom-nav[hidden] {
+  display: none;
+}
+
+.reversi-app .bottom-nav button {
+  min-height: 52px;
+  padding: 7px 0 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+
+.reversi-app .bottom-nav button .app-icon {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.7;
+}
+
+.reversi-app .bottom-nav button.active {
+  color: var(--felt);
+  font-weight: 600;
+}
+
+.reversi-app .bottom-nav button.active:after {
+  display: none;
+}
+
+.reversi-app .bottom-nav button .app-icon {
+  transition: transform .16s ease,stroke-width .18s ease;
+}
+
+.reversi-app .bottom-nav button:active .app-icon {
+  transform: scale(.86);
+}
+
+.reversi-app .bottom-nav button.active .app-icon {
+  stroke-width: 2;
+}
+
+@keyframes tab-pop {
+  0% {
+    transform: none;
+  }
+
+  30% {
+    transform: translateY(-2px) scale(1.14);
+  }
+
+  62% {
+    transform: translateY(1px) scale(.94);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+.reversi-app .bottom-nav button .app-icon.tap-tab {
+  animation: tab-pop .32s cubic-bezier(.3,.8,.3,1);
+}
+
+.reversi-app .capsule button .app-icon {
+  transition: transform .16s ease;
+}
+
+.reversi-app .capsule button:active .app-icon {
+  transform: scale(.84);
+}
+
+@keyframes dots-nudge {
+  0% {
+    transform: none;
+  }
+
+  34% {
+    transform: translateX(-2px) scale(.9);
+  }
+
+  68% {
+    transform: translateX(1px) scale(1.06);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes capsule-close {
+  0% {
+    transform: none;
+  }
+
+  42% {
+    transform: scale(.8) rotate(-12deg);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+.reversi-app .capsule button .app-icon.tap-dots {
+  animation: dots-nudge .3s ease-out;
+}
+
+.reversi-app .capsule button .app-icon.tap-close {
+  animation: capsule-close .32s ease-out;
+}
+
+.reversi-app.effects-off .bottom-nav .app-icon, .reversi-app.effects-off .capsule .app-icon {
+  animation: none!important;
+  transition: none!important;
+}
+
+.reversi-app .game-tools .text-btn:active, .reversi-app .skill-controls .equipped-skill:active, .reversi-app .skill-controls .btn:active, .reversi-app .skill-card:active {
+  transform: scale(.94);
+}
+
+.reversi-app .skill-controls .equipped-skill:active, .reversi-app .skill-card:active {
+  transform: scale(.975);
+}
+
+.reversi-app .cell.legal:active:after {
+  transform: scale(1.45);
+  background: var(--preview);
+  box-shadow: 0 0 0 3px rgba(187, 146, 80, 0.26);
+}
+
+@keyframes control-press {
+  0% {
+    transform: scale(var(--press,.94));
+  }
+
+  62% {
+    transform: scale(1.01);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+.reversi-app .tap-control {
+  animation: control-press .2s ease-out;
+}
+
+.reversi-app .skill-card.tap-control, .reversi-app .equipped-skill.tap-control {
+  --press: .975;
+}
+
+.reversi-app.effects-off .tap-control {
+  animation: none!important;
+}
+
+@media(hover:hover) {
+  .reversi-app .bottom-nav button:hover {
+    background: var(--hover);
+    color: var(--fg);
+  }
+}
+
+.reversi-app .home-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--fg);
+  opacity: .78;
+  z-index: 101;
+  pointer-events: none;
+}
+
+.reversi-app .viewport {
+  padding-bottom: 14px;
+}
+
+.reversi-app .screen {
+  touch-action: pan-y;
+}
+
+.reversi-app .screen.active {
+  animation: none;
+}
+
+.reversi-app .viewport[data-nav="push"] .screen.active {
+  animation: page-push .3s cubic-bezier(.32,.72,0,1) both;
+}
+
+.reversi-app .viewport[data-nav="pop"] .screen.active {
+  animation: page-pop .28s cubic-bezier(.32,.72,0,1) both;
+}
+
+.reversi-app .viewport[data-nav="tab"] .screen.active {
+  animation: page-tab .16s ease-out both;
+}
+
+@keyframes page-push {
+  from {
+    opacity: .5;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-pop {
+  from {
+    opacity: .5;
+    transform: translateX(-26px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-tab {
+  from {
+    opacity: .55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.reversi-app .toast {
+  left: 50%;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translate(-50%,-50%) scale(.94);
+  max-width: 78%;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(16, 24, 20, 0.9);
+  color: var(--ivory);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  transition: opacity .18s,transform .18s;
+  z-index: 60;
+}
+
+.reversi-app .toast.visible {
+  transform: translate(-50%,-50%) scale(1);
+}
+
+.reversi-app .sheet {
+  background: var(--surface);
+  border-top: 0;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 34px rgba(14, 11, 3, 0.16);
+  padding: 8px 18px max(18px,20px);
+}
+
+.reversi-app .sheet-head {
+  display: block;
+  position: relative;
+  min-height: 44px;
+  margin-bottom: 10px;
+}
+
+.reversi-app .sheet-head[hidden], .reversi-app .sheet-handle[hidden] {
+  display: none;
+}
+
+.reversi-app .sheet-head .h2 {
+  font: 600 17px/1.3 var(--body);
+  text-align: center;
+  padding: 12px 44px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reversi-app .sheet-head .icon-btn {
+  position: absolute;
+  right: -4px;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.reversi-app .sheet-head .icon-btn .app-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.reversi-app .sheet-body>.p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.reversi-app .sheet-handle {
+  cursor: grab;
+}
+
+.reversi-app .sheet-overlay.modal-mode {
+  align-items: center;
+  justify-content: center;
+  padding: 0 34px;
+}
+
+.reversi-app .sheet.dialog {
+  width: 100%;
+  max-width: 300px;
+  max-height: none;
+  border-radius: 12px;
+  padding: 0;
+  background: var(--surface);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  animation: dialog-in .18s ease-out;
+}
+
+.reversi-app .sheet.dialog .sheet-body {
+  overflow: visible;
+  padding: 0;
+}
+
+.reversi-app .dialog-title {
+  font: 600 17px/1.4 var(--body);
+  text-align: center;
+  padding: 24px 22px 8px;
+}
+
+.reversi-app .dialog-copy {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--muted);
+  text-align: center;
+  padding: 0 22px 22px;
+}
+
+.reversi-app .dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: .5px solid var(--border);
+}
+
+.reversi-app .dialog-actions button {
+  min-height: 50px;
+  font-size: 16px;
+  color: var(--fg);
+  border-right: .5px solid var(--border);
+}
+
+.reversi-app .dialog-actions button:last-child {
+  border-right: 0;
+}
+
+.reversi-app .dialog-actions .dialog-confirm {
+  color: var(--felt);
+  font-weight: 600;
+}
+
+.reversi-app .dialog-actions .dialog-confirm.danger {
+  color: var(--accent-ink);
+}
+
+@media(hover:hover) {
+  .reversi-app .dialog-actions button:hover {
+    background: var(--hover);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reversi-app .sheet.action-sheet {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0 0 20px;
+  max-height: none;
+  overflow: visible;
+  animation: sheet-in .22s ease-out;
+}
+
+.reversi-app .sheet.action-sheet .sheet-body {
+  overflow: visible;
+  padding: 0;
+}
+
+.reversi-app .action-list {
+  background: var(--surface);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+
+.reversi-app .action-list button {
+  width: 100%;
+  min-height: 56px;
+  font-size: 16px;
+  color: var(--fg);
+  border-bottom: .5px solid var(--border);
+}
+
+.reversi-app .action-list button:last-child {
+  border-bottom: 0;
+}
+
+.reversi-app .action-cancel {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 8px;
+  background: var(--surface);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+@media(hover:hover) {
+  .reversi-app .action-list button:hover, .reversi-app .action-cancel:hover {
+    background: var(--hover);
+  }
+}
+
+.reversi-app .btn {
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  border-color: var(--border);
+}
+
+.reversi-app .btn.primary {
+  background: var(--felt);
+  border-color: var(--felt);
+  color: var(--ivory);
+  box-shadow: none;
+}
+
+.reversi-app .btn.primary:hover {
+  background: var(--felt-dark);
+  border-color: var(--felt-dark);
+  color: var(--ivory);
+}
+
+.reversi-app .btn.secondary {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--fg);
+}
+
+.reversi-app .btn.secondary:hover {
+  background: var(--hover);
+  border-color: var(--fg);
+}
+
+.reversi-app .btn .end {
+  right: 14px;
+}
+
+.reversi-app .btn .app-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.reversi-app .two-actions .btn {
+  font-size: 15px;
+  min-height: 48px;
+}
+
+.reversi-app .text-btn {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.reversi-app .text-btn:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.reversi-app .game-tools .text-btn {
+  font-size: 12px;
+  padding-inline: 5px;
+}
+
+.reversi-app .game-tools .text-btn .app-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.reversi-app .segmented {
+  border-radius: 8px;
+  border-color: var(--border);
+  background: var(--surface);
+  padding: 3px;
+  gap: 3px;
+}
+
+.reversi-app .segmented button {
+  min-height: 44px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.reversi-app .segmented button[aria-checked="true"] {
+  background: var(--felt);
+  color: var(--ivory);
+  font-weight: 600;
+}
+
+.reversi-app .segmented button[aria-checked="true"]:hover {
+  background: var(--felt-dark);
+  color: var(--ivory);
+}
+
+.reversi-app .screen.pad {
+  padding: 16px 16px 30px;
+}
+
+.reversi-app .page-intro {
+  padding: 18px 0 16px;
+}
+
+.reversi-app .page-intro .h1 {
+  font-size: 27px;
+  line-height: 1.36;
+}
+
+.reversi-app .page-intro .p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-top: 7px;
+}
+
+.reversi-app .field-label {
+  font-size: 13px;
+  margin: 18px 0 9px;
+}
+
+.reversi-app .help-copy {
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.reversi-app .home {
+  padding: 12px 16px 0;
+}
+
+.reversi-app .home-title {
+  font-size: 30px;
+  line-height: 1.38;
+}
+
+.reversi-app .section-line {
+  font-size: 11px;
+}
+
+.reversi-app .home .table-photo {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.reversi-app .home .btn.primary {
+  border-radius: 10px;
+}
+
+.reversi-app .friend-links {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 10px 0 8px;
+}
+
+.reversi-app .friend-links .text-btn {
+  min-height: 48px;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.reversi-app .record-summary {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 10px 12px;
+  margin: 8px 0;
+}
+
+.reversi-app .record-summary .b {
+  font: 600 20px/1.2 var(--body);
+}
+
+.reversi-app .record-summary .text {
+  font-size: 10px;
+}
+
+.reversi-app .chapter-link {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+
+.reversi-app .chapter-link .strong {
+  font: 600 15px/1.5 var(--body);
+}
+
+.reversi-app .chapter-link .small-text {
+  font-size: 11px;
+}
+
+.reversi-app .mode-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.reversi-app .mode-option {
+  min-height: 68px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: .5px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  gap: 12px;
+}
+
+.reversi-app .mode-option:last-child {
+  border-bottom: 0;
+}
+
+.reversi-app .mode-option:hover {
+  background: var(--hover);
+}
+
+.reversi-app .mode-option.selected {
+  background: rgb(230, 226, 211);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.reversi-app .mode-option .strong {
+  font: 600 16px/1.4 var(--body);
+}
+
+.reversi-app .mode-option .small-text {
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.reversi-app .mode-check {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  position: relative;
+  flex: none;
+  margin-left: auto;
+}
+
+.reversi-app .mode-check:after {
+  display: none;
+}
+
+.reversi-app .mode-option.selected .mode-check {
+  border-color: var(--felt);
+  background: var(--felt);
+}
+
+.reversi-app .mode-option.selected .mode-check:after {
+  display: block;
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid var(--ivory);
+  border-bottom: 2px solid var(--ivory);
+  background: none;
+  border-radius: 0;
+  transform: rotate(-45deg);
+}
+
+.reversi-app .mode-art .stone {
+  width: 29px;
+}
+
+.reversi-app .record-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+  padding: 0;
+  margin-top: 4px;
+}
+
+.reversi-app .record-list .list-item {
+  border-bottom: .5px solid var(--border);
+}
+
+.reversi-app .record-list .list-item:last-child {
+  border-bottom: 0;
+}
+
+.reversi-app .record-item {
+  padding: 14px 16px;
+  border: 0;
+  grid-template-columns: 34px 1fr auto 16px;
+  gap: 10px;
+  min-height: 68px;
+}
+
+.reversi-app .record-item .b {
+  font: 600 20px/1.2 var(--body);
+  font-variant-numeric: tabular-nums;
+}
+
+.reversi-app .record-item .small-text {
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.reversi-app .record-seal {
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+.reversi-app .cell-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  stroke-width: 1.9;
+}
+
+.reversi-app .chapter-list {
+  border-top: 0;
+  margin-top: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.reversi-app .chapter-list .list-item {
+  border-bottom: .5px solid var(--border);
+}
+
+.reversi-app .chapter-list .list-item:last-child {
+  border-bottom: 0;
+}
+
+.reversi-app .chapter-card {
+  min-height: 78px;
+  padding: 14px 16px;
+  grid-template-columns: 40px 1fr 18px;
+  gap: 12px;
+}
+
+.reversi-app .chapter-card>.text {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font: 20px/1 var(--display);
+}
+
+.reversi-app .chapter-card .strong {
+  font: 600 16px var(--body);
+}
+
+.reversi-app .chapter-card .p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.reversi-app .settings-row {
+  min-height: 60px;
+  border-bottom: .5px solid var(--border);
+}
+
+.reversi-app .settings-row .strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.reversi-app .settings-row .small-text {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+
+.reversi-app .toggle .text {
+  width: 46px;
+  height: 28px;
+  border-radius: 14px;
+  border-color: var(--border);
+  background: rgb(218, 215, 202);
+}
+
+.reversi-app .toggle .text:after {
+  width: 22px;
+  height: 22px;
+  left: 3px;
+  top: 3px;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.reversi-app .toggle[aria-checked="true"] .text {
+  background: var(--felt);
+  border-color: var(--felt);
+}
+
+.reversi-app .toggle[aria-checked="true"] .text:after {
+  transform: translateX(18px);
+}
+
+.reversi-app .volume-control {
+  padding: 16px 0 12px;
+}
+
+.reversi-app .volume-label {
+  font-size: 13px;
+}
+
+.reversi-app .volume-control input {
+  accent-color: var(--felt);
+}
+
+.reversi-app .setting-note {
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.reversi-app .skill-card {
+  min-height: 68px;
+  padding: 12px 0;
+}
+
+.reversi-app .skill-card .strong {
+  font: 600 16px var(--body);
+}
+
+.reversi-app .skill-card .small-text {
+  font-size: 11px;
+}
+
+.reversi-app .skill-description {
+  font-size: 13px;
+}
+
+.reversi-app .skill-detail-line {
+  font-size: 13px;
+}
+
+.reversi-app .scorecard {
+  border-color: var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.reversi-app .empty-state .h2 {
+  font-size: 22px;
+}
+
+.reversi-app .empty-state .p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.reversi-app .room-paper {
+  border-color: var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.reversi-app .room-paper:before, .reversi-app .room-paper:after {
+  display: none;
+}
+
+.reversi-app .room-note {
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.reversi-app .seat .strong {
+  font: 600 16px var(--body);
+}
+
+.reversi-app .keypad button {
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.reversi-app .keypad button.word {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.reversi-app .keypad button:hover {
+  background: var(--hover);
+}
+
+.reversi-app .digit-boxes .text {
+  border-radius: 8px 8px 0 0;
+  border-color: var(--border);
+  border-bottom-width: 2px;
+  background: var(--surface);
+}
+
+.reversi-app .digit-boxes .text.next {
+  background: rgb(230, 226, 211);
+}
+
+.reversi-app .join-error {
+  font-size: 12px;
+}
+
+.reversi-app .phone .board-frame {
+  width: min(100%,max(220px,calc(var(--phone-h) - 349px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))));
+}
+
+.reversi-app .match {
+  padding: 10px 14px max(8px,env(safe-area-inset-bottom,0px));
+}
+
+.reversi-app .players {
+  gap: 8px;
+}
+
+.reversi-app .board-caption {
+  font-size: 11px;
+  min-height: 18px;
+}
+
+.reversi-app .turn-line {
+  font-size: 12px;
+}
+
+@media(max-width:350px) {
+  .reversi-app .nav-title {
+    font-size: 16px;
+  }
+
+  .reversi-app .btn {
+    font-size: 14px;
+    min-height: 46px;
+  }
+
+  .reversi-app .two-actions .btn {
+    font-size: 14px;
+  }
+
+  .reversi-app .page-intro .h1 {
+    font-size: 25px;
+  }
+
+  .reversi-app .home-title {
+    font-size: 27px;
+  }
+
+  .reversi-app .mode-option {
+    padding: 11px 12px;
+  }
+
+  .reversi-app .sheet {
+    padding-inline: 14px;
+  }
+
+  .reversi-app .record-item {
+    padding: 12px;
+  }
+}
+
+@media(max-height:680px) {
+  .reversi-app .btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .reversi-app .sheet {
+    max-height: 92%;
+  }
+
+  .reversi-app .page-intro {
+    padding: 12px 0 12px;
+  }
+
+  .reversi-app .page-intro .h1 {
+    font-size: 24px;
+  }
+
+  .reversi-app .home-title {
+    font-size: 26px;
+  }
+
+  .reversi-app .mode-option {
+    min-height: 62px;
+    padding-block: 10px;
+  }
+
+  .reversi-app .chapter-card {
+    min-height: 70px;
+    padding-block: 11px;
+  }
+}
+
+@media(max-width:1099px) {
+  .reversi-app .statusbar {
+    display: none;
+  }
+
+  .reversi-app .topbar {
+    height: calc(44px + env(safe-area-inset-top,0px));
+    min-height: calc(44px + env(safe-area-inset-top,0px));
+    padding-top: env(safe-area-inset-top,0px);
+  }
+
+  .reversi-app .home-indicator {
+    display: none;
+  }
+
+  .reversi-app .bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom,0px);
+  }
+
+  .reversi-app .sheet.action-sheet {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom,0px));
+  }
+
+  .reversi-app .viewport {
+    padding-bottom: 0;
+  }
+}

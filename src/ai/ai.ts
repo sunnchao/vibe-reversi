@@ -12,7 +12,7 @@ import {
   applyBoardAction,
   canUseSkill,
   cloneBoard,
-  countPieces,
+  DIRECTIONS,
   GameState,
   getOpponent,
   getSkillTargets,
@@ -34,6 +34,72 @@ export interface AIDecision {
   followUpPosition?: Position;
 }
 
+export interface AISearchOptions {
+  timeBudgetMs?: number;
+  nodeBudget?: number;
+}
+
+/** Callers may tighten either limit; even invalid/unbounded input cannot disable protection. */
+export const AI_SEARCH_LIMITS = Object.freeze({ timeBudgetMs: 120, nodeBudget: 12000 });
+
+interface SearchBudget {
+  deadline: number;
+  nodeLimit: number;
+  nodes: number;
+  stopped: boolean;
+}
+
+function boundedLimit(value: number | undefined, limit: number): number {
+  return value === undefined || !Number.isFinite(value) ? limit : Math.max(0, Math.min(limit, value));
+}
+
+function searchBudget(options: AISearchOptions): SearchBudget {
+  return {
+    deadline: Date.now() + boundedLimit(options.timeBudgetMs, AI_SEARCH_LIMITS.timeBudgetMs),
+    nodeLimit: Math.floor(boundedLimit(options.nodeBudget, AI_SEARCH_LIMITS.nodeBudget)),
+    nodes: 0,
+    stopped: false,
+  };
+}
+
+function hasBudget(budget: SearchBudget): boolean {
+  if (budget.stopped) return false;
+  if (budget.nodes >= budget.nodeLimit || Date.now() >= budget.deadline) budget.stopped = true;
+  return !budget.stopped;
+}
+
+/** Count/copy only completed capture lines, preserving the core's shield-blocking rule. */
+function scanFlips(
+  board: Piece[][], shielded: boolean[][] | undefined, color: PlayerColor,
+  row: number, col: number, flips?: number[], firstOnly = false,
+): number {
+  if (board[row][col] !== Piece.Empty) return 0;
+  const opponent = getOpponent(color);
+  let total = 0;
+  for (const [dr, dc] of DIRECTIONS) {
+    let r = row + dr, c = col + dc, count = 0;
+    while (r >= 0 && r < 8 && c >= 0 && c < 8 && board[r][c] === opponent) {
+      if (shielded?.[r][c]) { count = 0; break; }
+      count++; r += dr; c += dc;
+    }
+    if (!count || r < 0 || r >= 8 || c < 0 || c >= 8 || board[r][c] !== color) continue;
+    if (firstOnly) return 1;
+    total += count;
+    if (flips) {
+      for (let step = 1; step <= count; step++) flips.push((row + step * dr) * 8 + col + step * dc);
+    }
+  }
+  return total;
+}
+
+function countLegalMoves(board: Piece[][], shielded: boolean[][], color: PlayerColor): number {
+  let count = 0;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) count += scanFlips(board, shielded, color, row, col, undefined, true);
+  }
+  return count;
+}
+
 function isCorner(row: number, col: number): boolean {
   return (row === 0 || row === 7) && (col === 0 || col === 7);
 }
@@ -52,17 +118,8 @@ export function evaluateBoard(
   player: PlayerColor
 ): number {
   const opponent = getOpponent(player);
-  const counts = countPieces(board);
-  const myCount = player === Piece.Black ? counts.black : counts.white;
-  const oppCount = opponent === Piece.Black ? counts.black : counts.white;
-
-  if (myCount === 0) return -100000;
-  if (oppCount === 0) return 100000;
-  if (counts.empty === 0) {
-    return (myCount - oppCount) * 1000;
-  }
-
-  // 1. 位置权重 + 金身子护盾加分
+  let myCount = 0, oppCount = 0;
+  // Count pieces and positional weights in one pass, without a temporary count object.
   let posScore = 0;
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -74,22 +131,24 @@ export function evaluateBoard(
         else if (isEdge(r, c)) w += AI_EVAL_WEIGHTS.shieldEdgeBonus;
         else w += 15;
       }
-      if (p === player) posScore += w;
-      else posScore -= w;
+      if (p === player) { myCount++; posScore += w; }
+      else { oppCount++; posScore -= w; }
     }
   }
 
-  // 2. 行动力（合法落子点数量差）
-  const myMoves = getValidMoves(board, player, shielded);
-  const oppMoves = getValidMoves(board, opponent, shielded);
-  if (myMoves.length === 0 && oppMoves.length === 0) {
-    return (myCount - oppCount) * 1000;
-  }
-  const mobilityScore =
-    (myMoves.length - oppMoves.length) * AI_EVAL_WEIGHTS.mobilityMultiplier;
+  if (myCount === 0) return -100000;
+  if (oppCount === 0) return 100000;
+  const empty = 64 - myCount - oppCount;
+  if (empty === 0) return (myCount - oppCount) * 1000;
+
+  // Mobility only needs counts, not arrays of moves, capture lines and positions.
+  const myMoves = countLegalMoves(board, shielded, player);
+  const oppMoves = countLegalMoves(board, shielded, opponent);
+  if (myMoves === 0 && oppMoves === 0) return (myCount - oppCount) * 1000;
+  const mobilityScore = (myMoves - oppMoves) * AI_EVAL_WEIGHTS.mobilityMultiplier;
 
   // 3. 子数差（开局中局权重低，终局期 empty <= 14 权重调高）
-  const isLateGame = counts.empty <= 14;
+  const isLateGame = empty <= 14;
   const pieceWeight = isLateGame
     ? AI_EVAL_WEIGHTS.pieceDiffLate
     : AI_EVAL_WEIGHTS.pieceDiffEarly;
@@ -118,9 +177,44 @@ function fastApplyMove(
   return next;
 }
 
-/**
- * Negamax + Alpha-Beta 剪枝搜索
- */
+interface SearchPly {
+  moves: number[];
+  weights: number[];
+  flips: number[];
+}
+
+/** Reuse one set of numeric buffers per ply, rather than allocate ValidMove trees. */
+function orderedIndices(board: Piece[][], shielded: boolean[][], color: PlayerColor, ply: SearchPly) {
+  const { moves, weights } = ply;
+  moves.length = weights.length = 0;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const count = scanFlips(board, shielded, color, row, col);
+      if (!count) continue;
+      const weight = POSITION_WEIGHTS[row][col] + count * 2;
+      let at = moves.length;
+      while (at > 0 && weight > weights[at - 1]) {
+        moves[at] = moves[at - 1]; weights[at] = weights[at - 1]; at--;
+      }
+      moves[at] = row * 8 + col; weights[at] = weight;
+    }
+  }
+}
+
+function applySearchMove(board: Piece[][], shielded: boolean[][], color: PlayerColor, index: number, flips: number[]) {
+  flips.length = 0;
+  scanFlips(board, shielded, color, index >> 3, index % 8, flips);
+  board[index >> 3][index % 8] = color;
+  for (const i of flips) board[i >> 3][i % 8] = color;
+}
+
+function undoSearchMove(board: Piece[][], color: PlayerColor, index: number, flips: number[]) {
+  board[index >> 3][index % 8] = Piece.Empty;
+  const opponent = getOpponent(color);
+  for (const i of flips) board[i >> 3][i % 8] = opponent;
+}
+
+/** null aborts the entire search; incomplete branches must never compete with scored roots. */
 function negamax(
   board: Piece[][],
   shielded: boolean[][],
@@ -129,66 +223,41 @@ function negamax(
   alpha: number,
   beta: number,
   passedLastTurn: boolean,
-  deadlineMs: number
-): number {
-  if (depth <= 0 || Date.now() >= deadlineMs) {
-    return evaluateBoard(board, shielded, color);
-  }
+  budget: SearchBudget,
+  plies: SearchPly[],
+  plyIndex: number,
+): number | null {
+  if (!hasBudget(budget)) return null;
+  budget.nodes++;
+  if (depth <= 0) return evaluateBoard(board, shielded, color);
 
-  const moves = getValidMoves(board, color, shielded);
+  const ply = plies[plyIndex];
+  orderedIndices(board, shielded, color, ply);
   const opponent = getOpponent(color);
-
-  if (moves.length === 0) {
+  if (!ply.moves.length) {
     if (passedLastTurn) {
-      const counts = countPieces(board);
-      const myCount = color === Piece.Black ? counts.black : counts.white;
-      const oppCount = opponent === Piece.Black ? counts.black : counts.white;
-      return (myCount - oppCount) * 1000;
+      let difference = 0;
+      for (const row of board) for (const piece of row) {
+        if (piece === color) difference++; else if (piece === opponent) difference--;
+      }
+      return difference * 1000;
     }
-    return -negamax(
-      board,
-      shielded,
-      opponent,
-      depth - 1,
-      -beta,
-      -alpha,
-      true,
-      deadlineMs
-    );
+    const score = negamax(board, shielded, opponent, depth - 1, -beta, -alpha, true, budget, plies, plyIndex + 1);
+    return score === null ? null : -score;
   }
-
-  // 启发式走法排序（优先搜索角落与高权重格，大幅提升 Alpha-Beta 剪枝效率）
-  moves.sort(
-    (a, b) =>
-      POSITION_WEIGHTS[b.row][b.col] +
-      b.flips.length * 2 -
-      (POSITION_WEIGHTS[a.row][a.col] + a.flips.length * 2)
-  );
 
   let bestScore = -Infinity;
-  for (const move of moves) {
-    const nextBoard = fastApplyMove(board, color, move);
-    const score = -negamax(
-      nextBoard,
-      shielded,
-      opponent,
-      depth - 1,
-      -beta,
-      -alpha,
-      false,
-      deadlineMs
-    );
-    if (score > bestScore) {
-      bestScore = score;
-    }
-    if (score > alpha) {
-      alpha = score;
-    }
-    if (alpha >= beta) {
-      break; // Beta 剪枝
-    }
+  for (const index of ply.moves) {
+    if (!hasBudget(budget)) return null;
+    applySearchMove(board, shielded, color, index, ply.flips);
+    const child = negamax(board, shielded, opponent, depth - 1, -beta, -alpha, false, budget, plies, plyIndex + 1);
+    undoSearchMove(board, color, index, ply.flips);
+    if (child === null) return null;
+    const score = -child;
+    if (score > bestScore) bestScore = score;
+    if (score > alpha) alpha = score;
+    if (alpha >= beta) break;
   }
-
   return bestScore;
 }
 
@@ -231,54 +300,61 @@ function chooseL2Move(moves: ValidMove[]): ValidMove {
   return best;
 }
 
-/**
- * L3 Negamax + Alpha-Beta 搜索选点（深度 4–5，保证单步耗时 < 500ms）
- */
+/** Fixed-depth alpha-beta with a legal heuristic fallback and a whole-search cutoff. */
 function chooseL3Move(
   board: Piece[][],
   shielded: boolean[][],
   color: PlayerColor,
   moves: ValidMove[],
-  depth = 4,
-  timeBudgetMs = 350
-): { move: ValidMove; score: number } {
-  const deadlineMs = Date.now() + timeBudgetMs;
+  depth: number,
+  budget: SearchBudget,
+): { move: ValidMove; score?: number } {
+  let bestMove = chooseL2Move(moves);
+  if (!hasBudget(budget)) return { move: bestMove };
   const opponent = getOpponent(color);
-
-  const orderedMoves = [...moves].sort(
-    (a, b) =>
-      POSITION_WEIGHTS[b.row][b.col] +
-      b.flips.length * 2 -
-      (POSITION_WEIGHTS[a.row][a.col] + a.flips.length * 2)
-  );
-
-  let bestMove = orderedMoves[0];
-  let bestScore = -Infinity;
-  let alpha = -Infinity;
-  const beta = Infinity;
-
+  const orderedMoves = [...moves].sort((a, b) =>
+    POSITION_WEIGHTS[b.row][b.col] + b.flips.length * 2 -
+    (POSITION_WEIGHTS[a.row][a.col] + a.flips.length * 2));
+  // Clone only once; every branch restores this private board before stopping/returning.
+  const working = cloneBoard(board);
+  const plies: SearchPly[] = Array.from({ length: depth }, () => ({ moves: [], weights: [], flips: [] }));
+  const rootFlips: number[] = [];
+  let bestScore = -Infinity, alpha = -Infinity;
   for (const move of orderedMoves) {
-    const nextBoard = fastApplyMove(board, color, move);
-    const score = -negamax(
-      nextBoard,
-      shielded,
-      opponent,
-      depth - 1,
-      -beta,
-      -alpha,
-      false,
-      deadlineMs
-    );
-    if (score > bestScore) {
-      bestScore = score;
-      bestMove = move;
-    }
-    if (score > alpha) {
-      alpha = score;
-    }
+    if (!hasBudget(budget)) break;
+    const index = move.row * 8 + move.col;
+    applySearchMove(working, shielded, color, index, rootFlips);
+    const child = negamax(working, shielded, opponent, depth - 1, -Infinity, -alpha, false, budget, plies, 0);
+    undoSearchMove(working, color, index, rootFlips);
+    if (child === null) break;
+    const score = -child;
+    if (score > bestScore) { bestScore = score; bestMove = move; }
+    if (score > alpha) alpha = score;
   }
+  return { move: bestMove, score: bestScore === -Infinity ? undefined : bestScore };
+}
 
-  return { move: bestMove, score: bestScore };
+function chooseBaseMove(
+  board: Piece[][], shielded: boolean[][], color: PlayerColor, moves: ValidMove[],
+  level: AILevel, budget: SearchBudget,
+): { move: ValidMove; score?: number } {
+  if (!hasBudget(budget)) return { move: moves[0] };
+  if (level === 'L1') return { move: chooseL1Move(moves) };
+  if (level === 'L2' || level === 'L2_PLUS') return { move: chooseL2Move(moves) };
+  return chooseL3Move(board, shielded, color, moves, level === 'L3_BOSS' ? 5 : 4, budget);
+}
+
+const NO_SHIELDS: boolean[][] = Array.from({ length: 8 }, () => Array(8).fill(false));
+
+/** Shared skill-free entry used by the production uniapp, without constructing a legacy GameState. */
+export function computeAIMove(
+  board: Piece[][], color: PlayerColor, level: AILevel, options: AISearchOptions = {},
+): Position | undefined {
+  const budget = searchBudget(options);
+  const moves = getValidMoves(board, color);
+  if (!moves.length) return undefined;
+  const move = chooseBaseMove(board, NO_SHIELDS, color, moves, level, budget).move;
+  return { row: move.row, col: move.col };
 }
 
 /**
@@ -288,9 +364,10 @@ function evaluateAISkillDecision(
   state: GameState,
   level: AILevel,
   baseMove: ValidMove,
-  baseScore: number
+  baseScore: number,
+  budget: SearchBudget,
 ): AIDecision | null {
-  if (level === 'L1') return null; // L1 新手关不用技能
+  if (level === 'L1' || !hasBudget(budget)) return null; // L1 新手关不用技能
 
   const player = state.currentPlayer;
   const equipped = state.players[player].equippedSkills;
@@ -313,6 +390,7 @@ function evaluateAISkillDecision(
   }
 
   // 2. 若可以使用「偷天换日 (steal)」直接抢占对方已占的角落
+  if (!hasBudget(budget)) return null;
   if (canUseSkill(state, player, 'steal').usable) {
     const stealTargets = getSkillTargets(state, player, 'steal');
     const cornerSteal = stealTargets.find((t) => isCorner(t.row, t.col));
@@ -326,6 +404,7 @@ function evaluateAISkillDecision(
   }
 
   // 3. 若可以使用「连落双子 (double)」，模拟连落 2 子的收益
+  if (!hasBudget(budget)) return null;
   if (canUseSkill(state, player, 'double').usable) {
     const selState = selectSkill(state, 'double').state;
     const step1Res = applyBoardAction(selState, baseMove.row, baseMove.col);
@@ -362,12 +441,14 @@ function evaluateAISkillDecision(
   }
 
   // 4. 若可以使用「炸弹子 (bomb)」，找能额外炸翻最多对方棋子且综合分更高的落子点
+  if (!hasBudget(budget)) return null;
   if (canUseSkill(state, player, 'bomb').usable) {
     const validMoves = getValidMoves(state.board, player, state.shielded);
     let bestBombPos: Position | null = null;
     let bestBombScore = baseScore + 28; // 至少比普通落子高出阈值才放炸弹
 
     for (const m of validMoves) {
+      if (!hasBudget(budget)) break;
       const selState = selectSkill(state, 'bomb').state;
       const bombRes = applyBoardAction(selState, m.row, m.col);
       if (bombRes.ok) {
@@ -398,72 +479,30 @@ function evaluateAISkillDecision(
 /**
  * 计算 AI 当前回合的完整决策
  */
-export function computeAIDecision(state: GameState, level: AILevel): AIDecision {
+export function computeAIDecision(state: GameState, level: AILevel, options: AISearchOptions = {}): AIDecision {
+  const budget = searchBudget(options);
   const player = state.currentPlayer;
-
-  // 若正处于连落双子第 2 步
-  if (state.selectedSkill?.skillId === 'double' && state.selectedSkill.doubleStep === 2) {
-    const moves = getValidMoves(state.board, player, state.shielded);
-    if (moves.length === 0) {
-      return { actionType: 'pass' };
-    }
-    const move =
-      level === 'L1'
-        ? chooseL1Move(moves)
-        : level === 'L2' || level === 'L2_PLUS'
-        ? chooseL2Move(moves)
-        : chooseL3Move(state.board, state.shielded, player, moves, 4).move;
-    return {
-      actionType: 'move',
-      position: { row: move.row, col: move.col },
-    };
-  }
-
   const validMoves = getValidMoves(state.board, player, state.shielded);
+  const doubleStep = state.selectedSkill?.skillId === 'double' && state.selectedSkill.doubleStep === 2;
 
   // 无合法落子时：若可用「求你等我」则优先换取 +20 能量，否则 pass
-  if (validMoves.length === 0) {
-    if (level !== 'L1' && canUseSkill(state, player, 'wait').usable) {
+  if (!validMoves.length) {
+    if (!doubleStep && level !== 'L1' && canUseSkill(state, player, 'wait').usable) {
       return { actionType: 'skill', skillId: 'wait' };
     }
     return { actionType: 'pass' };
   }
 
-  // 计算基础最优落子
-  let baseMove: ValidMove;
-  let baseScore: number;
-
-  if (level === 'L1') {
-    baseMove = chooseL1Move(validMoves);
-    baseScore = evaluateBoard(state.board, state.shielded, player);
-  } else if (level === 'L2' || level === 'L2_PLUS') {
-    baseMove = chooseL2Move(validMoves);
-    const nextBoard = fastApplyMove(state.board, player, baseMove);
-    baseScore = evaluateBoard(nextBoard, state.shielded, player);
-  } else {
-    const searchDepth = level === 'L3_BOSS' ? 5 : 4;
-    const res = chooseL3Move(
-      state.board,
-      state.shielded,
-      player,
-      validMoves,
-      searchDepth,
-      350
-    );
-    baseMove = res.move;
-    baseScore = res.score;
-  }
-
-  // 评估是否释放技能
-  const skillDecision = evaluateAISkillDecision(state, level, baseMove, baseScore);
-  if (skillDecision) {
-    return skillDecision;
-  }
-
-  return {
-    actionType: 'move',
-    position: { row: baseMove.row, col: baseMove.col },
+  const base = hasBudget(budget)
+    ? chooseBaseMove(state.board, state.shielded, player, validMoves, level, budget)
+    : { move: validMoves[0] };
+  const decision: AIDecision = {
+    actionType: 'move', position: { row: base.move.row, col: base.move.col },
   };
+  if (doubleStep || level === 'L1' || !state.players[player].equippedSkills.length || !hasBudget(budget)) return decision;
+
+  const baseScore = base.score ?? evaluateBoard(fastApplyMove(state.board, player, base.move), state.shielded, player);
+  return evaluateAISkillDecision(state, level, base.move, baseScore, budget) ?? decision;
 }
 
 /**

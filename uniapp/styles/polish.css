@@ -1,0 +1,1254 @@
+/* Detail polish layered on the imported OpenDesign snapshot.
+ * Keep design.css generated; put interaction refinements here.
+ */
+
+.reversi-app button {
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease,
+    transform .12s ease, box-shadow .18s ease, opacity .16s ease;
+}
+
+.reversi-app .phone {
+  --game-chrome-top: calc(44px + env(safe-area-inset-top, 0px));
+}
+
+@media (min-width: 1100px) {
+  .reversi-app .phone {
+    --game-chrome-top: 85px;
+  }
+}
+
+.reversi-app button:focus-visible,
+.reversi-app input:focus-visible,
+.reversi-app [tabindex]:focus-visible {
+  outline-color: var(--fg);
+}
+
+.reversi-app .cell:focus-visible {
+  outline-color: var(--ivory);
+}
+
+/* Disabled primary actions stay readable instead of turning into pale white-on-green. */
+.reversi-app .btn.primary[disabled] {
+  opacity: 1;
+  background: transparent;
+  border-color: var(--border);
+  color: rgba(29, 43, 37, .72);
+  box-shadow: none;
+}
+
+.reversi-app .btn.primary[disabled] .app-icon {
+  opacity: .45;
+}
+
+.reversi-app .btn.secondary[disabled]:hover {
+  background: transparent;
+  border-color: var(--border);
+}
+
+/* Join screen: the active slot is an ink caret, not a red error underline. */
+.reversi-app .digit-boxes .text {
+  position: relative;
+  background: transparent;
+  transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+
+.reversi-app .digit-boxes .text.filled {
+  background: var(--surface);
+  border-bottom-color: var(--fg);
+  animation: digit-in .18s ease-out;
+}
+
+.reversi-app .digit-boxes .text.next {
+  border-color: var(--brass);
+  border-bottom-color: var(--fg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(187, 146, 80, .22);
+}
+
+.reversi-app .digit-boxes .text.next:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: 1px;
+  height: 48%;
+  background: var(--fg);
+  transform: translateX(-.5px);
+  animation: caret-blink 1.1s steps(1, end) infinite;
+}
+
+.reversi-app .join-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.reversi-app .join-error {
+  flex: 1;
+  min-height: 0;
+}
+
+.reversi-app .join-error.hint {
+  color: var(--muted);
+}
+
+.reversi-app .join-error.ready {
+  color: var(--felt);
+}
+
+.reversi-app .join-paste {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reversi-app .join-paste:hover {
+  background: transparent;
+  color: var(--fg);
+}
+
+.reversi-app .join-paste[disabled] {
+  opacity: .4;
+}
+
+/* Keep the playable board high and the thumb controls low. */
+.reversi-app #screen-game .match {
+  min-height: calc(var(--phone-h) - var(--game-chrome-top));
+}
+
+.reversi-app .match-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  margin-top: auto;
+}
+
+.reversi-app .match-controls .game-tools {
+  margin-top: 0;
+}
+
+.reversi-app .classic-match .match-controls {
+  margin-top: 0;
+}
+
+.reversi-app .mode-dock {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  z-index: 4;
+}
+
+.reversi-app .sheet-overlay {
+  align-items: center;
+  justify-content: center;
+  padding: max(14px, env(safe-area-inset-top, 0px)) 14px max(14px, env(safe-area-inset-bottom, 0px));
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.reversi-app .sheet-dismiss {
+  position: absolute;
+  inset: 0;
+}
+
+.reversi-app .sheet-overlay .sheet {
+  position: relative;
+  width: 100%;
+  max-width: 364px;
+  max-height: 100%;
+  padding: 8px 16px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 14px 40px rgba(15, 25, 18, .24), 0 3px 9px rgba(15, 25, 18, .12);
+  overflow: hidden;
+  animation: none;
+}
+
+.reversi-app .sheet-overlay .sheet.dialog,
+.reversi-app .sheet-overlay .sheet.action-sheet {
+  max-width: 318px;
+  padding: 0;
+}
+
+.reversi-app .sheet-overlay .sheet-body {
+  flex: 0 1 auto;
+  max-height: calc(var(--phone-h) - 138px);
+}
+
+.reversi-app .sheet-overlay .action-list,
+.reversi-app .sheet-overlay .action-cancel {
+  border-radius: 0;
+}
+
+.reversi-app .sheet-overlay .action-cancel {
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+}
+
+.reversi-app .sheet-footer {
+  flex: none;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.reversi-app .sheet-footer .btn {
+  min-height: 46px;
+}
+
+@media (max-height: 700px) {
+  .reversi-app .sheet-footer {
+    padding-top: 8px;
+  }
+
+  .reversi-app .sheet-footer .btn {
+    min-height: 44px;
+  }
+}
+
+/* The incoming page eases into place while the outgoing page fades underneath. */
+.reversi-app .screen-stack {
+  position: relative;
+  /* Clip the outgoing page to the incoming page's box so it cannot peek below it. */
+  overflow: hidden;
+}
+
+.reversi-app .screen-stack .screen.leaving {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  animation: screen-leave .14s ease-out both;
+  pointer-events: none;
+}
+
+.reversi-app .viewport .screen-stack .screen.active {
+  position: relative;
+  z-index: 1;
+  /* Opaque paper so the outgoing page never shows through the incoming one. */
+  background: var(--bg);
+  /* Suppress the generated page-in animation; navigation supplies the only
+   * screen transition, so an initial render never looks like a jolt. */
+  animation: none;
+}
+
+.reversi-app .viewport .screen-stack[data-nav="push"] .screen.active {
+  animation: screen-enter .22s cubic-bezier(.22,.7,.2,1) both;
+}
+
+.reversi-app .viewport .screen-stack[data-nav="pop"] .screen.active {
+  animation: screen-enter-back .2s cubic-bezier(.22,.7,.2,1) both;
+}
+
+.reversi-app .viewport .screen-stack[data-nav="tab"] .screen.active {
+  animation: screen-enter-tab .16s ease-out both;
+}
+
+@keyframes screen-enter {
+  from {
+    transform: translateX(14px);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes screen-enter-back {
+  from {
+    transform: translateX(-10px);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes screen-enter-tab {
+  from {
+    transform: translateY(6px);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes screen-leave {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.reversi-app .nav-title {
+  animation: nav-title-in .16s ease-out both;
+}
+
+@keyframes nav-title-in {
+  from {
+    opacity: .35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.reversi-app.effects-off .viewport .screen-stack .screen.active,
+.reversi-app.effects-off .screen-stack .screen.leaving,
+.reversi-app.effects-off .nav-title {
+  animation: none;
+}
+
+.reversi-app .mode-dock .btn {
+  min-height: 44px;
+}
+
+.reversi-app .mode-dock .text-btn {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+/* No overshoot or nudging: feedback stays a single soft press. */
+.reversi-app button:active:not([disabled]) {
+  transform: scale(.985);
+}
+
+.reversi-app .tap-control {
+  animation: soft-press .2s ease-out;
+}
+
+.reversi-app .bottom-nav button .app-icon.tap-tab,
+.reversi-app .capsule button .app-icon.tap-dots,
+.reversi-app .capsule button .app-icon.tap-close,
+.reversi-app .native-more .app-icon.tap-dots {
+  animation: soft-press .22s ease-out;
+}
+
+@keyframes soft-press {
+  from {
+    opacity: .55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Room seats: avatar (or stone) with a small colour chip so both players read at a glance. */
+.reversi-app .seat-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 10px;
+}
+
+.reversi-app .seat-avatar {
+  width: 64px;
+  height: 64px;
+  display: block;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  object-fit: cover;
+}
+
+.reversi-app .seat-initial {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--fg);
+  font: 600 24px/1 var(--display);
+  box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 4px rgba(29, 43, 37, .08), 0 1px 3px rgba(0, 0, 0, .12);
+}
+
+.reversi-app .seat-initial.white {
+  background: var(--ivory);
+  box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 4px var(--border), 0 1px 3px rgba(0, 0, 0, .1);
+}
+
+.reversi-app .seat-face .stone {
+  width: 56px;
+  margin: 0;
+}
+
+.reversi-app .seat>.strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reversi-app .seat-badge {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--black);
+  border: 2px solid var(--bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+}
+
+.reversi-app .seat-badge.white {
+  background: var(--ivory);
+  border-color: var(--bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18), inset 0 0 0 1px var(--border);
+}
+
+.reversi-app .seat.waiting .seat-avatar {
+  opacity: .4;
+}
+
+.reversi-app .room-profile-cta {
+  width: 100%;
+  min-height: 34px;
+  margin: -2px 0 12px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px dashed var(--border);
+  background: rgba(255, 255, 255, .18);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.reversi-app .room-profile-cta .app-icon {
+  flex: none;
+}
+
+.reversi-app .room-profile-cta .cta-copy {
+  min-width: 0;
+}
+
+/* Friend-room avatars also replace the generic stones during the match. */
+.reversi-app .player .player-avatar {
+  width: 28px;
+  height: 28px;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  object-fit: cover;
+}
+
+.reversi-app .player-title {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reversi-app .chapter-done {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 4px;
+  border: 1px solid var(--accent);
+  color: var(--accent-ink);
+  font: 10px/1.6 var(--display);
+  letter-spacing: .04em;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.reversi-app .chapter-card>.text {
+  position: relative;
+}
+
+.reversi-app .chapter-card>.text:after {
+  content: "章";
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font: 7px/1 var(--display);
+  letter-spacing: 0;
+}
+
+.reversi-app .chapter-link .chapter-no {
+  position: relative;
+}
+
+.reversi-app .chapter-link .chapter-no:after {
+  content: "章";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font: 7px/1 var(--display);
+  letter-spacing: 0;
+}
+
+@media (min-width: 1100px) {
+  .reversi-app #screen-game .match {
+    min-height: calc(var(--phone-h) - var(--game-chrome-top) - 14px);
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-height: 700px) {
+  /* Keep the last card clear of the bottom navigation instead of sitting flush against it. */
+  .reversi-app #screen-home {
+    padding-bottom: 14px;
+  }
+
+  .reversi-app .room-profile-cta {
+    min-height: 32px;
+    margin-bottom: 10px;
+    padding-block: 5px;
+    font-size: 10px;
+  }
+
+  .reversi-app .player .player-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .reversi-app .keypad button {
+    min-height: 44px;
+  }
+
+  .reversi-app .keypad {
+    gap: 5px;
+    margin: 8px 0 12px;
+  }
+}
+
+@media (max-height: 600px) and (max-width: 350px) {
+  .reversi-app .keypad {
+    margin-bottom: 8px;
+  }
+}
+
+/* Short screens: keep the result card and its actions within the first screen. */
+@media (max-height: 700px) {
+  .reversi-app #screen-result .section-line {
+    padding: 0 0 8px !important;
+    font-size: 10px;
+  }
+
+  .reversi-app #screen-result .scorecard {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .reversi-app #screen-result .result-title {
+    font-size: 21px;
+    margin: 6px 0;
+  }
+
+  .reversi-app #screen-result .result-scores .b {
+    font-size: 26px;
+  }
+
+  .reversi-app #screen-result .result-board {
+    width: 84px;
+    margin-block: 10px;
+  }
+
+  .reversi-app #screen-result .result-meta {
+    padding-top: 8px;
+  }
+
+  .reversi-app #screen-result .result-foot {
+    font-size: 12px;
+    line-height: 1.7;
+    margin-top: 8px;
+  }
+
+  .reversi-app #screen-result .two-actions {
+    margin-top: 8px;
+  }
+
+  .reversi-app #screen-result .two-actions .btn {
+    min-height: 44px;
+  }
+
+  .reversi-app #screen-result > .text-btn {
+    margin-top: 2px !important;
+  }
+
+  .reversi-app #screen-modes .page-intro {
+    padding: 12px 0 10px;
+  }
+
+  .reversi-app #screen-modes .page-intro .h1 {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .reversi-app #screen-modes .mode-option {
+    min-height: 52px;
+    padding-block: 6px;
+  }
+
+  .reversi-app #screen-modes .mode-option .strong {
+    font-size: 15px;
+  }
+
+  .reversi-app #screen-modes .mode-option .small-text {
+    margin-top: 2px;
+  }
+
+  .reversi-app #screen-modes .field-label {
+    margin: 10px 0 6px;
+  }
+
+  .reversi-app #screen-modes .help-copy {
+    margin: 7px 0 12px;
+    line-height: 1.7;
+  }
+
+  /* The same copy is one tap away under「怎么玩？」, so the short-screen fold stays clear. */
+  .reversi-app #screen-modes .help-copy {
+    display: none;
+  }
+
+  .reversi-app #screen-modes .mode-footer {
+    margin-top: 9px;
+  }
+
+  .reversi-app #screen-modes .segmented button {
+    min-height: 42px;
+  }
+
+  .reversi-app #screen-modes .mode-footer .text-btn {
+    min-height: 40px;
+  }
+
+  /* On short screens the difficulty label shares the row with its three options. */
+  .reversi-app #screen-modes .difficulty-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .reversi-app #screen-modes .difficulty-block .field-label {
+    margin: 0;
+    flex: none;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .reversi-app #screen-modes .difficulty-block .segmented {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .reversi-app #screen-modes .mode-footer .btn {
+    min-height: 44px;
+  }
+
+  .reversi-app #screen-modes .mode-footer .text-btn {
+    min-height: 36px;
+    font-size: 12px;
+  }
+}
+
+@media (max-height: 600px) {
+  .reversi-app #screen-result .section-line {
+    padding-bottom: 6px !important;
+  }
+
+  .reversi-app #screen-result .scorecard {
+    padding: 10px 12px;
+  }
+
+  .reversi-app #screen-result .scorecard-header {
+    padding-bottom: 8px;
+  }
+
+  .reversi-app #screen-result .result-title {
+    font-size: 19px;
+    margin: 4px 0;
+  }
+
+  .reversi-app #screen-result .result-scores .b {
+    font-size: 23px;
+  }
+
+  .reversi-app #screen-result .result-scores .small-text {
+    margin-top: 2px;
+  }
+
+  .reversi-app #screen-result .result-board {
+    width: 74px;
+    margin-block: 8px;
+  }
+
+  .reversi-app #screen-result .result-meta {
+    padding-top: 7px;
+    font-size: 9px;
+  }
+
+  .reversi-app #screen-result .result-foot {
+    font-size: 11px;
+    line-height: 1.65;
+    margin-top: 6px;
+  }
+
+  .reversi-app #screen-result > .btn.primary {
+    min-height: 44px;
+  }
+
+  .reversi-app #screen-modes .page-intro {
+    padding: 10px 0 8px;
+  }
+
+  .reversi-app #screen-modes .page-intro .h1 {
+    font-size: 22px;
+  }
+
+  .reversi-app #screen-modes .mode-option {
+    min-height: 54px;
+    padding-block: 6px;
+  }
+
+  .reversi-app #screen-modes .field-label {
+    margin: 9px 0 6px;
+  }
+
+  .reversi-app #screen-modes .eyebrow {
+    margin-bottom: 4px;
+  }
+
+  .reversi-app #screen-modes .page-intro {
+    padding: 8px 0 6px;
+  }
+
+  .reversi-app #screen-modes .help-copy {
+    margin: 6px 0 9px;
+    font-size: 11px;
+  }
+
+  .reversi-app #screen-modes .mode-footer {
+    margin-top: 8px;
+  }
+
+  .reversi-app #screen-modes .mode-footer .text-btn {
+    min-height: 40px;
+    font-size: 12px;
+  }
+
+  .reversi-app #screen-modes .mode-option {
+    min-height: 50px;
+    padding-block: 5px;
+  }
+
+  .reversi-app #screen-modes .segmented button {
+    min-height: 40px;
+  }
+
+  .reversi-app #screen-modes .difficulty-block .segmented button {
+    min-height: 38px;
+    font-size: 12px;
+  }
+
+  .reversi-app #screen-modes .mode-option .strong {
+    font-size: 15px;
+  }
+
+  .reversi-app #screen-modes .mode-option .small-text {
+    font-size: 11px;
+  }
+
+  .reversi-app #screen-modes .mode-list .ai-symbol,
+  .reversi-app #screen-modes .mode-art {
+    transform: scale(.88);
+  }
+
+  /* Clamp the description to one line so selecting a mode never changes card height. */
+  .reversi-app #screen-modes .mode-option {
+    min-height: 50px;
+  }
+
+  .reversi-app #screen-modes .mode-option .small-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    line-height: 1.6;
+  }
+
+  .reversi-app #screen-modes .field-label {
+    min-height: 32px;
+    margin: 8px 0 5px;
+  }
+
+  .reversi-app #screen-modes .field-label .text-btn {
+    min-height: 32px;
+  }
+
+  .reversi-app #screen-modes .page-intro .h1 {
+    font-size: 20px;
+  }
+
+  .reversi-app #screen-modes .page-intro {
+    padding: 6px 0 5px;
+  }
+
+  .reversi-app #screen-modes .mode-footer {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Keep the invite action clear of the 320×568 fold after adding the name-card hint. */
+  .reversi-app #screen-room .room-intro {
+    padding-bottom: 8px;
+  }
+
+  .reversi-app #screen-room .room-intro .h1 {
+    font-size: 24px;
+    line-height: 1.32;
+  }
+
+  .reversi-app #screen-room .room-paper {
+    padding: 10px 12px;
+  }
+
+  .reversi-app #screen-room .room-code {
+    margin: 6px 0 4px;
+  }
+
+  .reversi-app #screen-room .seats {
+    padding: 14px 14px 8px;
+  }
+
+  .reversi-app #screen-room .seat-face {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 6px;
+  }
+
+  .reversi-app #screen-room .seat-avatar,
+  .reversi-app #screen-room .seat-initial {
+    width: 56px;
+    height: 56px;
+  }
+
+  .reversi-app #screen-room .seat-face .stone {
+    width: 50px;
+  }
+
+  .reversi-app #screen-room .room-status {
+    padding-bottom: 8px;
+  }
+
+  .reversi-app #screen-room .room-profile-cta {
+    margin-bottom: 8px;
+  }
+
+  .reversi-app #screen-room .room-actions {
+    gap: 6px;
+  }
+
+  .reversi-app #screen-room .room-note {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+}
+
+/* Legal points get a quiet brass halo; the dot itself still reads at 320px. */
+.reversi-app .cell.legal:after {
+  width: 19%;
+  background: radial-gradient(circle at 34% 28%, rgb(239, 218, 174), var(--brass) 62%, rgb(144, 106, 50));
+  box-shadow: 0 0 0 1px rgba(187, 146, 80, .6), 0 0 0 5px rgba(187, 146, 80, .08), 0 0 12px rgba(187, 146, 80, .3);
+  animation: legal-breathe 2.6s ease-in-out infinite;
+}
+
+@media (hover: hover) {
+  .reversi-app .cell.legal:hover:before {
+    opacity: .72;
+    box-shadow: 0 3px 5px rgba(0, 5, 2, .3), 0 0 0 1px rgba(187, 146, 80, .35);
+  }
+
+  .reversi-app .cell.legal:hover:after {
+    animation: none;
+  }
+}
+
+.reversi-app .cell.legal:focus-visible:after,
+.reversi-app .cell.legal:active:after {
+  animation: none;
+}
+
+/* Armed skill: a paper toggle with one cinnabar crosshair, not a red block. */
+.reversi-app .skill-controls .btn.primary.armed,
+.reversi-app .skill-controls .btn.primary.armed:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: inset 0 0 0 1px rgba(185, 77, 53, .14);
+}
+
+.reversi-app .skill-controls .btn.primary.armed:before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--accent), var(--accent)) center / 1px 14px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) center / 14px 1px no-repeat;
+  opacity: .9;
+}
+
+/* Last-move seal: larger, lifted clear of the stone edge, still a tiny stamp. */
+.reversi-app .cell.last {
+  z-index: 4;
+}
+
+.reversi-app .cell.last .stone:after {
+  content: "末";
+  right: -6%;
+  bottom: -2%;
+  width: 38%;
+  min-width: 11px;
+  border: 1px solid var(--accent);
+  background: var(--ivory);
+  color: var(--accent-ink);
+  font: 600 7.5px/1 var(--display);
+  box-shadow: 0 1px 2px rgba(3, 3, 3, .28), 0 0 0 1px rgba(245, 238, 221, .75);
+  z-index: 2;
+  animation: seal-in .26s cubic-bezier(.2, .8, .2, 1.1) both;
+}
+
+/* Score changes settle with a quiet fade, never a moving layout. */
+.reversi-app .player-score,
+.reversi-app .result-scores .b {
+  animation: score-bump .22s ease-out;
+}
+
+.reversi-app .player-score,
+.reversi-app .result-scores .b,
+.reversi-app .record-summary .b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Waiting and offline dots breathe instead of sitting dead. */
+.reversi-app .status-dot.wait {
+  animation: status-breathe 1.8s ease-in-out infinite;
+}
+
+.reversi-app .status-dot.offline {
+  animation: status-breathe-offline 1.4s ease-in-out infinite;
+}
+
+/* Energy becomes six brass tokens rather than a battery bar. */
+.reversi-app .energy-pips {
+  gap: 4px;
+}
+
+.reversi-app .energy-pips .i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(187, 146, 80, .5);
+  background: rgba(245, 238, 221, .22);
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.reversi-app .energy-pips .i.full {
+  border-color: rgb(127, 96, 47);
+  background: radial-gradient(circle at 35% 28%, rgb(230, 207, 153), var(--brass) 62%, rgb(140, 106, 51));
+  box-shadow: 0 0 0 1px rgba(187, 146, 80, .16), 0 1px 2px rgba(0, 0, 0, .22);
+  animation: energy-pop .22s ease-out;
+}
+
+.reversi-app .game-tools {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.reversi-app .game-tools .text-btn {
+  width: 100%;
+  min-height: 48px;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.reversi-app .game-tools .text-btn .app-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.reversi-app .resign-mark {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  color: var(--accent-ink);
+  font: 600 10px/1 var(--display);
+  flex: none;
+}
+
+.reversi-app .replay-board {
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+}
+
+/* Transient feedback sits below the header so it never covers the keypad. */
+.reversi-app .toast {
+  left: 50%;
+  right: auto;
+  top: calc(50px + env(safe-area-inset-top, 0px));
+  bottom: auto;
+  width: max-content;
+  transform: translate(-50%, -6px);
+  max-width: 86%;
+  padding: 9px 14px;
+  border: 1px solid rgba(245, 238, 221, .16);
+  border-radius: 3px;
+  background: rgba(20, 32, 26, .94);
+  color: var(--ivory);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+  font-size: 12px;
+  line-height: 1.6;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.reversi-app .toast.visible {
+  transform: translate(-50%, 0);
+}
+
+.reversi-app .toast:before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brass), transparent);
+}
+
+/* Touch browsers keep :hover after a tap; do not let it read as a selected state. */
+.reversi-app.touch-device .keypad button:hover {
+  background: rgb(239, 234, 220);
+  border-color: var(--border);
+}
+
+.reversi-app.touch-device .keypad button.word:hover {
+  background: transparent;
+}
+
+.reversi-app.touch-device .bottom-nav button:hover {
+  background: transparent;
+  color: var(--muted);
+}
+
+.reversi-app.touch-device .bottom-nav button.active:hover {
+  color: var(--felt);
+}
+
+.reversi-app.touch-device .mode-option:not(.selected):hover {
+  background: transparent;
+}
+
+.reversi-app.touch-device .segmented button:not([aria-checked="true"]):hover {
+  background: transparent;
+}
+
+.reversi-app.touch-device .btn.primary:not([disabled]):hover {
+  background: var(--felt);
+  border-color: var(--felt);
+}
+
+.reversi-app.touch-device .btn.secondary:not([disabled]):hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.reversi-app.touch-device .text-btn:hover,
+.reversi-app.touch-device .icon-btn:hover {
+  background: transparent;
+}
+
+.reversi-app.touch-device .join-paste:hover {
+  background: transparent;
+  color: var(--muted);
+}
+
+.reversi-app.touch-device .record-item:hover .record-seal {
+  border-color: var(--fg);
+  background: transparent;
+}
+
+.reversi-app.touch-device .replay-log button:not([aria-current="true"]):hover {
+  background: transparent;
+}
+
+@media (min-width: 1100px) {
+  .reversi-app .toast {
+    top: 93px;
+  }
+}
+
+.reversi-app.effects-off button {
+  transition: none;
+}
+
+.reversi-app.effects-off .toast {
+  transition: none;
+}
+
+.reversi-app.effects-off .digit-boxes .text.filled,
+.reversi-app.effects-off .digit-boxes .text.next:after,
+.reversi-app.effects-off .cell.legal:after,
+.reversi-app.effects-off .cell.last .stone:after,
+.reversi-app.effects-off .player-score,
+.reversi-app.effects-off .result-scores .b,
+.reversi-app.effects-off .status-dot.wait,
+.reversi-app.effects-off .status-dot.offline,
+.reversi-app.effects-off .energy-pips .i.full {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reversi-app .screen-stack .screen.active,
+  .reversi-app .screen-stack .screen.leaving,
+  .reversi-app .nav-title,
+  .reversi-app .digit-boxes .text.filled,
+  .reversi-app .digit-boxes .text.next:after,
+  .reversi-app .cell.legal:after,
+  .reversi-app .cell.last .stone:after,
+  .reversi-app .player-score,
+  .reversi-app .result-scores .b,
+  .reversi-app .status-dot.wait,
+  .reversi-app .status-dot.offline,
+  .reversi-app .energy-pips .i.full {
+    animation: none !important;
+  }
+}
+
+@keyframes digit-in {
+  from {
+    opacity: .2;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes caret-blink {
+  0%, 52% {
+    opacity: 1;
+  }
+
+  53%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes legal-breathe {
+  0%, 100% {
+    opacity: .78;
+    box-shadow: 0 0 0 1px rgba(187, 146, 80, .55), 0 0 0 4px rgba(187, 146, 80, .08), 0 0 8px rgba(187, 146, 80, .24);
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 1px rgba(187, 146, 80, .7), 0 0 0 7px rgba(187, 146, 80, .05), 0 0 14px rgba(187, 146, 80, .46);
+  }
+}
+
+@keyframes seal-in {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes score-bump {
+  from {
+    opacity: .45;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes status-breathe {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(187, 146, 80, .0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(187, 146, 80, .18);
+  }
+}
+
+@keyframes status-breathe-offline {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(185, 77, 53, .0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(185, 77, 53, .2);
+  }
+}
+
+@keyframes energy-pop {
+  from {
+    opacity: .35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

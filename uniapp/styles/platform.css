@@ -1,0 +1,112 @@
+/* The imported design stays untouched; only platform differences live here. */
+html, body, #app, page { width: 100%; height: 100%; min-height: 100%; margin: 0; padding: 0; }
+body { background: #e9e3d4; }
+page, #app, .reversi-app { overflow: hidden; }
+.reversi-app { width: 100%; height: 100vh; height: 100dvh; min-height: 0; }
+.desk { height: 100vh; height: 100dvh; min-height: 0; }
+.phone { min-height: 0; }
+.viewport { min-height: 0; flex: 1 1 auto; -webkit-overflow-scrolling: touch; }
+.sheet-overlay { overflow: hidden; }
+.sheet-body { -webkit-overflow-scrolling: touch; }
+/* Percent-sized stones need a definite track inside custom uni-app elements. */
+.reversi-app .cell,
+.reversi-app .result-board .text,
+.reversi-app .replay-board > .text,
+.reversi-app .skill-demo > .text {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+/* The opaque source grain must tint the felt rather than replace its color. */
+.reversi-app .board { background-blend-mode: normal, normal, multiply; }
+/* Framework control defaults are reset before the imported design. */
+input { min-width: 0; margin: 0; border-radius: 0; }
+image { vertical-align: middle; }
+.screen .h1, .screen .h2, .screen .h3, .screen .p { display: block; }
+.line-break { display: block; height: 0; }
+[aria-disabled="true"] { cursor: default; }
+.result-board, .replay-board, .skill-demo, .energy-pips, .record-summary,
+.replay-log, .replay-range, .room-code, .digit-boxes { min-width: 0; }
+/* Keep the title centered around WeChat's actual capsule, with no second capsule. */
+.native-phone .topbar {
+  margin-top: var(--native-top);
+  padding: 0 8px;
+  height: var(--native-header);
+  min-height: var(--native-header);
+  grid-template-columns: var(--native-capsule-right) 1fr var(--native-capsule-right);
+}
+.native-phone .board-frame { width: min(100%, max(220px, calc(var(--phone-h) - 349px - var(--native-top) - env(safe-area-inset-bottom, 0px)))); }
+/* hover-class gives native touch controls the source design's pressed preview. */
+.reversi-app .cell.legal.cell-pressed::after {
+  transform: scale(1.45);
+  background: var(--preview);
+  box-shadow: 0 0 0 3px rgba(187, 146, 80, .26);
+}
+@media (max-width: 600px) {
+  .phone { --phone-h: 100vh; --phone-h: 100dvh; height: var(--phone-h); min-height: 0; }
+}
+/* WeChat uses a pixel window height supplied by getWindowInfo. */
+/* #ifdef MP-WEIXIN */
+.native-phone { height: var(--phone-h); width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+.reversi-app .native-phone { --game-chrome-top: calc(var(--native-top) + var(--native-header)); }
+.reversi-app .native-phone .toast { top: calc(var(--native-top) + var(--native-header) + 8px); }
+.reversi-app .native-phone .keypad button:focus { outline: none; }
+.native-phone .viewport { height: 0; padding-bottom: 0; }
+.reversi-app,
+.reversi-app::before,
+.reversi-app::after,
+.reversi-app view,
+.reversi-app view::before,
+.reversi-app view::after,
+.reversi-app text,
+.reversi-app text::before,
+.reversi-app text::after,
+.reversi-app button,
+.reversi-app button::before,
+.reversi-app button::after,
+.reversi-app image,
+.reversi-app image::before,
+.reversi-app image::after,
+.reversi-app scroll-view,
+.reversi-app input,
+.reversi-app slider {
+  animation: none !important;
+  transition: none !important;
+}
+.reversi-app button:active,
+.reversi-app button:active .app-icon,
+.reversi-app .cell.legal:active::after,
+.reversi-app .cell.legal.cell-pressed::after {
+  transform: none !important;
+}
+/* #endif */
+/* Container-query fallbacks keep the 320px native layout equivalent. */
+@media (max-width: 350px) {
+  .home { padding: 12px 16px 0; }
+  .home-title { font-size: 27px; }
+  .intro { padding: 12px 0; }
+  .home .photo-caption { font-size: 10px; }
+  .player-score { font-size: 23px; }
+  .player-name { font-size: 11px; }
+  .room-code { font-size: 30px; }
+  .join-digits { margin-top: 15px; }
+  .keypad button { min-height: 48px; }
+  .keypad { gap: 6px; margin: 10px 0 15px; }
+  .chapter-card .strong { font-size: 16px; }
+}
+@media (max-height: 600px) and (max-width: 350px) {
+  .home { padding-top: 10px; }
+  .home .intro { padding-block: 7px; }
+  .room-code { font-size: 28px; }
+  .keypad button { min-height: 44px; }
+  .keypad { gap: 5px; margin-top: 8px; margin-bottom: 12px; }
+  .join-digits { margin-top: 10px; height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reversi-app view, .reversi-app text, .reversi-app uni-button,
+  .reversi-app image, .reversi-app scroll-view, .reversi-app input {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

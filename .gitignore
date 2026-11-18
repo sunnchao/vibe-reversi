@@ -1,4 +1,14 @@
 node_modules/
 dist/
+/game.js
+/cloudfunctions/reversiRoom/index.js
 *.log
 .DS_Store
+.playwright-cli/
+.playwright-mcp/
+output/
+.local/
+.env
+.env.*
+!.env.wechat.example
+project.private.config.json

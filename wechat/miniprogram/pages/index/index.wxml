@@ -1,0 +1,4 @@
+<view class="game-page">
+  <canvas id="gameCanvas" type="2d" class="game-canvas" bindtouchstart="onCanvasTap"></canvas>
+  <button wx:if="{{canShare}}" class="native-share" open-type="share" aria-label="将棋局分享给微信好友">分享</button>
+</view>

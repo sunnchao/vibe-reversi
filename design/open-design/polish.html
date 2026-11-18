@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>翻盘棋 · 细节精修对照稿</title>
+<style>
+:root{
+  --paper:#e9e3d4;
+  --paper-hi:#f0ebdf;
+  --paper-lo:#ddd5c3;
+  --felt:#244d3e;
+  --felt-deep:#1a382d;
+  --felt-line:rgba(8,20,14,.24);
+  --ink:#1d2b25;
+  --muted:#5a625a;
+  --line:#c0b49b;
+  --line-soft:rgba(29,43,37,.16);
+  --brass:#bb9250;
+  --brass-deep:#86642f;
+  --cinnabar:#b94d35;
+  --seal:#a8412c;
+  --wood:#8a6537;
+  --wood-dark:#4a3620;
+  --ivory:#f4eddc;
+  --white:#fbf7ec;
+  --black:#141815;
+  --display:"Songti SC","STSong","Noto Serif CJK SC",Georgia,serif;
+  --body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-width:1440px;
+  color:var(--ink);
+  font-family:var(--body);
+  background-color:#d9d1bf;
+  background-image:
+    radial-gradient(circle at 1px 1px,rgba(60,48,30,.07) 0 .6px,transparent .8px),
+    radial-gradient(circle at 4px 5px,rgba(255,255,255,.4) 0 .5px,transparent .7px);
+  background-size:7px 7px,11px 11px;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;color:inherit}
+button:focus-visible,.focusable:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+::selection{background:rgba(187,146,80,.3)}
+
+/* ── 对照板 ─────────────────────────────────────────── */
+.sheet{
+  position:relative;
+  width:1440px;
+  margin:0 auto;
+  padding:26px 36px 34px;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(circle at 1px 1px,rgba(60,48,30,.05) 0 .6px,transparent .8px),
+    radial-gradient(circle at 4px 5px,rgba(255,255,255,.45) 0 .5px,transparent .7px);
+  background-size:7px 7px,11px 11px;
+  box-shadow:0 0 0 1px rgba(29,43,37,.22),0 24px 60px -40px rgba(20,28,22,.5);
+}
+.sheet::after{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border:1px solid rgba(29,43,37,.14);
+  pointer-events:none;
+}
+.masthead{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:40px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--ink);
+}
+.kicker,.mini-kicker{
+  display:block;
+  font:9px/1.2 var(--mono);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.masthead h1{
+  margin:7px 0 0;
+  font:600 34px/1.25 var(--display);
+  letter-spacing:0;
+}
+.mast-right{display:flex;align-items:flex-end;gap:22px;padding-bottom:2px}
+.mast-lede{
+  max-width:372px;
+  margin:0;
+  font:11px/1.75 var(--body);
+  color:var(--muted);
+}
+.mast-seal{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.seal-mark{
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  background:var(--seal);
+  border:1.5px solid var(--ivory);
+  color:var(--ivory);
+  font:700 14px/1 var(--display);
+  transform:rotate(-3deg);
+  box-shadow:0 1px 2px rgba(15,20,16,.28);
+}
+.mast-seal small{font:8px/1 var(--mono);letter-spacing:.06em;color:var(--muted)}
+
+.board-grid{
+  display:grid;
+  grid-template-columns:844px 492px;
+  gap:32px;
+  align-items:start;
+  margin-top:16px;
+}
+.left-col{width:844px}
+.phones{
+  display:grid;
+  grid-template-columns:410px 410px;
+  gap:24px;
+  align-items:start;
+}
+.phone-card{margin:0}
+.phone-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:20px;
+  margin-bottom:6px;
+  font:9.5px/1 var(--mono);
+  letter-spacing:.03em;
+  color:var(--muted);
+}
+.phone-label .tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0;
+}
+.phone-label .tag i{
+  width:16px;
+  height:16px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--ink);
+  font:600 8.5px/1 var(--mono);
+  font-style:normal;
+  color:var(--ink);
+}
+.phone-label .dims{font:8.5px/1 var(--mono);color:var(--muted);letter-spacing:.04em}
+
+/* ── 手机外壳 ───────────────────────────────────────── */
+.phone{
+  width:410px;
+  height:864px;
+  padding:9px;
+  border:1px solid #0c100d;
+  border-radius:48px;
+  background:#20261f;
+  box-shadow:
+    0 30px 44px -30px rgba(16,22,17,.65),
+    0 8px 16px -12px rgba(16,22,17,.4),
+    inset 0 0 0 1px rgba(255,255,255,.07);
+}
+.screen{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:39px;
+  background:var(--paper);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
+}
+.statusbar{
+  flex:none;
+  height:42px;
+  padding:14px 24px 0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  color:var(--ink);
+}
+.statusbar .time{font:600 12px/1 var(--body);letter-spacing:.02em;padding-top:1px}
+.status-icons{display:flex;align-items:center;gap:5px}
+.status-icons svg{display:block;height:11px;width:auto;overflow:visible}
+.navbar{
+  position:relative;
+  flex:none;
+  height:44px;
+  display:flex;
+  align-items:center;
+  border-bottom:1px solid var(--line-soft);
+  padding:0 10px 0 12px;
+}
+.nav-back{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  color:var(--ink);
+}
+.nav-back svg{width:9px;height:15px}
+.nav-title{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font:600 13.5px/1 var(--display);
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+.capsule{
+  margin-left:auto;
+  width:78px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  border:1px solid rgba(29,43,37,.22);
+  border-radius:14px;
+  background:var(--paper-hi);
+}
+.caps-dots{flex:1;display:flex;align-items:center;justify-content:center;gap:2px}
+.caps-dots i{width:2.5px;height:2.5px;border-radius:50%;background:var(--ink)}
+.caps-div{width:1px;height:14px;background:rgba(29,43,37,.18)}
+.caps-ring{flex:1;display:grid;place-items:center}
+.caps-ring i{width:9px;height:9px;border:1px solid var(--ink);border-radius:50%;position:relative}
+.caps-ring i::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--ink)}
+.home{
+  position:absolute;
+  left:50%;
+  bottom:7px;
+  width:134px;
+  height:5px;
+  transform:translateX(-50%);
+  border-radius:3px;
+  background:rgba(29,43,37,.72);
+}
+.sr-only{
+  position:absolute;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ── 棋子与材质 ─────────────────────────────────────── */
+.stone{
+  position:relative;
+  display:inline-block;
+  aspect-ratio:1;
+  border-radius:50%;
+  flex:none;
+  background:radial-gradient(ellipse at 35% 25%,#3a3b37,var(--black) 56%,#080a08 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,.28),
+    inset 0 -3px 3px rgba(0,0,0,.6),
+    0 3px 2px rgba(10,14,10,.4),
+    0 6px 7px rgba(10,14,10,.15);
+}
+.stone::before{
+  content:"";
+  position:absolute;
+  top:13%;left:20%;
+  width:44%;height:13%;
+  border-radius:50%;
+  background:rgba(255,255,255,.1);
+  transform:rotate(-24deg);
+}
+.stone.white{
+  background:radial-gradient(ellipse at 34% 24%,var(--white),var(--ivory) 50%,#cfc3aa 100%);
+  box-shadow:
+    inset 0 1px 2px var(--white),
+    inset 0 -3px 2px rgba(103,88,60,.4),
+    0 3px 2px rgba(12,16,12,.35),
+    0 6px 7px rgba(12,16,12,.1);
+}
+.stone.white::before{background:rgba(255,255,255,.55)}
+
+/* ── A 屏 · 技能局 ──────────────────────────────────── */
+.game-content{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:7px 14px 8px;
+}
+.game-spacer{flex:1;min-height:8px}
+.score-head{flex:none}
+.eyebrow-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font:8.5px/1 var(--mono);
+  letter-spacing:.08em;
+  color:var(--muted);
+}
+.eyebrow-row .live{display:inline-flex;align-items:center;gap:5px;font-family:var(--body);font-size:9.5px;letter-spacing:0;color:var(--ink)}
+.eyebrow-row .live i{width:4px;height:4px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 3px rgba(187,146,80,.16)}
+.score-row{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:end;
+  gap:6px;
+  margin-top:5px;
+}
+.side{display:flex;align-items:center;gap:6px;min-width:0}
+.side .stone{width:20px}
+.side-text strong{display:block;font:600 12.5px/1.2 var(--body);color:var(--ink);white-space:nowrap}
+.side-text small{display:block;margin-top:2px;font:8.5px/1 var(--mono);color:var(--muted);letter-spacing:.04em}
+.side.white{justify-content:flex-end;text-align:right}
+.score{text-align:center;padding:0 2px}
+.score-label{display:block;font:7.5px/1 var(--mono);letter-spacing:.16em;color:var(--muted)}
+.score-nums{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:5px;
+  margin-top:2px;
+  font:600 30px/1 var(--display);
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+}
+.score-nums em{font-style:normal;font-size:14px;font-weight:400;color:var(--muted);transform:translateY(-2px)}
+.score-num{display:inline-block;transform-origin:50% 62%}
+.score-num.bump{animation:bump 320ms cubic-bezier(.2,.7,.3,1)}
+.turn-line{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:5px;
+  padding-top:5px;
+  border-top:1px solid var(--line-soft);
+  font:10px/1 var(--body);
+  color:var(--ink);
+}
+.turn-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ink);
+  box-shadow:0 0 0 3px rgba(29,43,37,.08);
+}
+.turn-line .last-mini{margin-left:auto;font:8.5px/1 var(--mono);color:var(--muted);letter-spacing:.03em}
+
+.board-wrap{
+  flex:none;
+  margin-top:8px;
+  padding:7px;
+  border:1px solid var(--wood-dark);
+  border-radius:4px;
+  background:
+    repeating-linear-gradient(92deg,rgba(56,38,18,.3) 0 1px,transparent 1px 4px),
+    linear-gradient(100deg,#77572f,var(--brass) 46%,var(--wood));
+  box-shadow:
+    inset 0 0 0 1px rgba(244,237,220,.2),
+    0 2px 0 #3b2a19,
+    0 8px 14px -9px rgba(16,22,16,.6);
+}
+.board{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  aspect-ratio:1;
+  background:var(--felt);
+  box-shadow:inset 0 0 0 1px rgba(6,16,10,.55),inset 0 0 20px rgba(6,16,10,.32);
+}
+.cell{
+  position:relative;
+  display:grid;
+  place-items:center;
+  border-right:1px solid var(--felt-line);
+  border-bottom:1px solid var(--felt-line);
+}
+.cell:nth-child(8n){border-right:0}
+.cell:nth-child(n+57){border-bottom:0}
+.cell>.stone{width:80%;z-index:1}
+.last-ring{
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  border:1px solid rgba(185,77,53,.72);
+  border-radius:50%;
+  pointer-events:none;
+}
+.last-seal{
+  position:absolute;
+  right:-5px;
+  bottom:-5px;
+  z-index:3;
+  width:19px;
+  height:19px;
+  display:grid;
+  place-items:center;
+  background:var(--seal);
+  border:1.5px solid var(--ivory);
+  color:var(--ivory);
+  font:600 10px/1 var(--display);
+  transform:rotate(-3deg);
+  transform-origin:50% 50%;
+  box-shadow:0 .5px 0 rgba(10,14,10,.35),0 1px 2px rgba(10,14,10,.28);
+  animation:seal-in 220ms cubic-bezier(.2,.8,.3,1) both;
+}
+.hint{
+  position:absolute;
+  top:50%;left:50%;
+  z-index:3;
+  width:5px;
+  height:5px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:var(--brass);
+  box-shadow:
+    0 0 0 5px rgba(187,146,80,.26),
+    0 0 8px 2px rgba(187,146,80,.18),
+    inset 0 1px 1px rgba(255,255,255,.45);
+  animation:breathe 2.8s ease-in-out infinite;
+  animation-delay:var(--d,0s);
+  pointer-events:none;
+}
+.cell>.ghost{
+  position:absolute;
+  top:50%;left:50%;
+  z-index:1;
+  width:76%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity 160ms ease;
+  pointer-events:none;
+}
+@media (hover:hover){
+  .cell.legal:hover .hint{animation:none;opacity:0}
+  .cell.legal:hover .ghost{opacity:.52}
+}
+.board-meta{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:17px;
+  margin-top:3px;
+  font:8.5px/1 var(--mono);
+  letter-spacing:.02em;
+  color:var(--muted);
+}
+.board-meta .legal-count{display:inline-flex;align-items:center;gap:5px}
+.board-meta .legal-count i{width:4px;height:4px;border-radius:50%;background:var(--brass)}
+
+.energy-row{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:7px;
+  padding-top:7px;
+  border-top:1px solid var(--line-soft);
+}
+.energy-label{font:8.5px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
+.tokens{display:flex;align-items:center;gap:7px}
+.token{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  border:1px solid rgba(187,146,80,.42);
+  background:transparent;
+  transition:background 280ms ease,box-shadow 280ms ease,border-color 280ms ease;
+}
+.token.on{
+  border-color:var(--brass-deep);
+  background:radial-gradient(circle at 35% 30%,#d8bd8e,var(--brass) 58%,#96702f 100%);
+  box-shadow:inset 0 .5px .5px rgba(255,255,255,.55),0 1px 1px rgba(20,24,18,.22);
+}
+.energy-count{
+  margin-left:auto;
+  font:9.5px/1 var(--mono);
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+  letter-spacing:.03em;
+}
+.energy-count em{font-style:normal;color:var(--muted)}
+
+.skill-card{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  height:60px;
+  margin-top:7px;
+  padding:0 9px;
+  border:1px solid var(--line-soft);
+  border-radius:2px;
+  background:var(--paper-hi);
+}
+.skill-icon{
+  flex:none;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line-soft);
+  color:rgba(29,43,37,.78);
+  transition:color 180ms ease;
+}
+.skill-icon svg{width:21px;height:21px;display:block}
+.skill-copy{flex:1;min-width:0}
+.skill-copy strong{display:block;font:600 14px/1.2 var(--display);letter-spacing:.02em}
+.skill-copy small{display:block;margin-top:3px;font:9px/1.35 var(--body);color:var(--muted);white-space:nowrap}
+.skill-btn{
+  flex:none;
+  width:92px;
+  height:44px;
+  padding:0;
+  border:1px solid rgba(29,43,37,.52);
+  border-radius:2px;
+  background:transparent;
+  color:var(--ink);
+  font:600 11.5px/1 var(--body);
+  letter-spacing:.02em;
+  cursor:pointer;
+  transition:background 120ms ease,border-color 120ms ease,transform 120ms ease,color 120ms ease;
+}
+.skill-btn:hover{background:rgba(29,43,37,.055)}
+.skill-btn:active{transform:scale(.96);background:rgba(29,43,37,.08)}
+.skill-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.skill-btn:disabled{
+  cursor:not-allowed;
+  color:color-mix(in srgb,var(--ink) 72%,var(--paper));
+  border-color:color-mix(in srgb,var(--ink) 26%,transparent);
+  background:color-mix(in srgb,var(--ink) 3%,var(--paper));
+}
+.skill-card[data-state="armed"] .skill-icon{color:var(--cinnabar)}
+.skill-card[data-state="disabled"] .skill-icon{color:rgba(29,43,37,.4)}
+.skill-card[data-state="disabled"] .skill-copy strong{color:rgba(29,43,37,.78)}
+.game-hint{
+  flex:none;
+  margin-top:6px;
+  font:9px/1.45 var(--body);
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.game-tools{
+  flex:none;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  margin-top:auto;
+  padding:3px 4px 14px;
+  border-top:1px solid var(--line-soft);
+}
+.tool{
+  min-height:44px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:0;
+  border:0;
+  border-radius:2px;
+  background:transparent;
+  color:var(--ink);
+  font:9.5px/1 var(--body);
+  cursor:pointer;
+  transition:background 160ms ease,transform 160ms ease;
+}
+.tool svg{width:14px;height:14px;opacity:.82}
+.tool:hover{background:rgba(29,43,37,.05)}
+.tool:active{transform:scale(.94);background:rgba(29,43,37,.07)}
+.tool:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--brass)}
+
+/* ── B 屏 · 加入房间 ────────────────────────────────── */
+.join-content{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  padding:17px 22px 24px;
+}
+.join-head{flex:none}
+.join-head h1{
+  margin:7px 0 6px;
+  font:600 27px/1.3 var(--display);
+  letter-spacing:.01em;
+}
+.join-head p{
+  margin:0;
+  max-width:312px;
+  font:10.5px/1.7 var(--body);
+  color:var(--muted);
+}
+.join-label-row{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin:15px 0 7px;
+  font:8.5px/1 var(--mono);
+  letter-spacing:.08em;
+  color:var(--muted);
+}
+.join-label-row .count{font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--ink)}
+.digits{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+.digit{
+  position:relative;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  border-radius:1px;
+  background:color-mix(in srgb,var(--paper-hi) 45%,var(--paper));
+  color:var(--ink);
+  font:600 26px/1 var(--display);
+  font-variant-numeric:tabular-nums;
+  transition:box-shadow 160ms ease,border-color 160ms ease,background 160ms ease;
+}
+.digit.active{
+  border-color:color-mix(in srgb,var(--brass) 62%,var(--line));
+  background:var(--paper-hi);
+  box-shadow:inset 0 0 0 1.5px var(--brass);
+}
+.caret{
+  width:1.5px;
+  height:20px;
+  background:var(--ink);
+  animation:caret 1.1s steps(1,end) infinite;
+}
+.paste-row{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  margin-top:2px;
+}
+.paste-hint{flex:1;font:8.5px/1.5 var(--body);color:var(--muted)}
+.paste-btn{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-height:44px;
+  padding:0 1px;
+  border:0;
+  border-bottom:1px solid var(--brass);
+  background:transparent;
+  color:var(--ink);
+  font:10.5px/1 var(--body);
+  cursor:pointer;
+  transition:background 120ms ease;
+}
+.paste-btn svg{width:13px;height:13px;opacity:.8}
+.paste-btn:hover{background:rgba(29,43,37,.045)}
+.paste-btn:active{background:rgba(29,43,37,.075)}
+.paste-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.join-spacer{flex:1;min-height:10px}
+.join-note{
+  flex:none;
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin-top:9px;
+  padding:7px 0 0;
+  border-top:1px solid var(--line-soft);
+}
+.join-note i{
+  flex:none;
+  width:4px;height:4px;
+  margin-top:4px;
+  border-radius:50%;
+  background:var(--brass);
+}
+.join-note strong{display:block;font:600 9.5px/1.35 var(--body);color:var(--ink)}
+.join-note small{display:block;margin-top:2px;font:8.5px/1.5 var(--body);color:var(--muted)}
+.keypad{
+  flex:none;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+.key{
+  height:54px;
+  padding:0;
+  border:1px solid var(--line-soft);
+  border-radius:3px;
+  background:var(--paper-hi);
+  color:var(--ink);
+  font:22px/1 var(--display);
+  cursor:pointer;
+  transition:background 120ms ease,transform 120ms ease;
+}
+.key:hover{background:color-mix(in srgb,var(--ink) 4%,var(--paper-hi))}
+.key:active{transform:scale(.97);background:color-mix(in srgb,var(--ink) 7%,var(--paper-hi))}
+.key:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.key.word{font:10px/1 var(--body);letter-spacing:.02em}
+.join-cta{
+  flex:none;
+  width:100%;
+  height:48px;
+  margin-top:8px;
+  border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);
+  border-radius:2px;
+  background:var(--paper);
+  color:color-mix(in srgb,var(--ink) 72%,var(--paper));
+  font:600 12.5px/1 var(--body);
+  letter-spacing:.04em;
+  cursor:not-allowed;
+  transition:background 160ms ease,color 160ms ease,border-color 160ms ease,transform 120ms ease;
+}
+.join-cta.ready{
+  border-color:var(--felt-deep);
+  background:var(--felt);
+  color:var(--ivory);
+  cursor:pointer;
+  box-shadow:0 2px 0 var(--felt-deep);
+}
+.join-cta.ready:hover{background:color-mix(in srgb,var(--felt) 88%,#000)}
+.join-cta.ready:active{transform:translateY(1px);box-shadow:0 1px 0 var(--felt-deep)}
+.join-cta:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.join-caption{
+  flex:none;
+  min-height:14px;
+  margin-top:5px;
+  text-align:center;
+  font:9.5px/1.4 var(--body);
+  color:var(--muted);
+  transition:color 160ms ease;
+}
+.join-caption.ready{color:var(--ink)}
+.join-caption .demo{color:var(--muted)}
+
+/* ── 右侧标注 ───────────────────────────────────────── */
+.notes{width:492px}
+.spec-top{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--ink);
+}
+.spec-top h2{margin:5px 0 0;font:600 20px/1.15 var(--display);letter-spacing:.01em}
+.spec-top .range{font:9px/1 var(--mono);letter-spacing:.1em;color:var(--muted);padding-bottom:3px}
+.demo-controls{
+  padding:9px 0 10px;
+  border-bottom:1px solid var(--line-soft);
+}
+.control-row{display:flex;align-items:center;gap:8px;min-height:30px}
+.control-row + .control-row{margin-top:5px}
+.control-label{
+  width:70px;
+  flex:none;
+  font:8.5px/1 var(--mono);
+  letter-spacing:.06em;
+  color:var(--muted);
+}
+.seg{
+  display:flex;
+  border:1px solid rgba(29,43,37,.4);
+  border-radius:2px;
+  overflow:hidden;
+}
+.seg button{
+  min-height:28px;
+  padding:0 9px;
+  border:0;
+  border-right:1px solid rgba(29,43,37,.22);
+  background:var(--paper);
+  color:var(--ink);
+  font:10px/1 var(--body);
+  cursor:pointer;
+  transition:background 120ms ease,color 120ms ease;
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--paper-hi)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg button:focus-visible{outline:2px solid var(--brass);outline-offset:-3px}
+.demo-btn{
+  min-height:28px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:0 9px;
+  border:1px solid rgba(29,43,37,.3);
+  border-radius:2px;
+  background:var(--paper);
+  color:var(--ink);
+  font:10px/1 var(--body);
+  cursor:pointer;
+  transition:background 120ms ease,transform 120ms ease;
+}
+.demo-btn:hover{background:var(--paper-hi)}
+.demo-btn:disabled{color:var(--muted);border-color:var(--line-soft);background:var(--paper);cursor:not-allowed;opacity:1}
+.demo-btn:disabled:hover{background:var(--paper)}
+.demo-btn:active{transform:scale(.97);background:color-mix(in srgb,var(--ink) 6%,var(--paper))}
+.demo-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.demo-btn .dot{
+  width:6px;height:6px;border-radius:50%;
+  border:1px solid var(--brass);
+}
+.demo-btn .dot.on{background:var(--brass)}
+.control-note{
+  margin:7px 0 0;
+  font:9px/1.55 var(--body);
+  color:var(--muted);
+}
+
+.note{
+  padding:9px 0 10px;
+  border-bottom:1px solid var(--line-soft);
+}
+.note-head{display:flex;align-items:baseline;gap:8px}
+.note-head .n{
+  font:9px/1 var(--mono);
+  color:var(--muted);
+  letter-spacing:.04em;
+  transform:translateY(-1px);
+}
+.note-head h3{
+  margin:0;
+  font:600 13px/1.2 var(--display);
+  letter-spacing:.02em;
+}
+.note-head .tag{
+  margin-left:auto;
+  font:8px/1 var(--mono);
+  letter-spacing:.06em;
+  color:var(--muted);
+  white-space:nowrap;
+}
+.note p{
+  margin:5px 0 6px;
+  font:10.5px/1.65 var(--body);
+  color:var(--muted);
+}
+.spec-list{display:flex;flex-direction:column;gap:2px;margin:0}
+.spec-list > div{display:flex;align-items:baseline;gap:8px}
+.spec-list dt{
+  flex:none;
+  width:44px;
+  font:8px/1.5 var(--mono);
+  letter-spacing:.06em;
+  color:var(--muted);
+}
+.spec-list dd{
+  margin:0;
+  font:9.5px/1.55 var(--body);
+  color:var(--ink);
+}
+.spec-list code{
+  font:9px/1 var(--mono);
+  color:var(--ink);
+  border-bottom:1px solid rgba(187,146,80,.65);
+  padding-bottom:1px;
+}
+.spec-list .sep{color:var(--muted);padding:0 3px}
+.spec-list .ok{color:var(--ink);border-bottom:1px solid rgba(36,77,62,.35);padding-bottom:1px}
+
+.motion-band{
+  display:grid;
+  grid-template-columns:184px 1fr;
+  column-gap:16px;
+  margin-top:14px;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--line-soft);
+  padding:7px 0 6px;
+}
+.motion-title .mini-kicker{margin-bottom:4px}
+.motion-title h2{margin:0;font:600 15px/1.2 var(--display);letter-spacing:.02em}
+.motion-items{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border-left:1px solid var(--line-soft);
+}
+.motion-item{
+  min-width:0;
+  padding:1px 10px 0;
+  border-right:1px solid var(--line-soft);
+}
+.motion-item:last-child{border-right:0}
+.motion-item .m-label{
+  display:block;
+  font:8px/1.2 var(--body);
+  color:var(--muted);
+  white-space:nowrap;
+}
+.motion-item b{
+  display:block;
+  margin-top:5px;
+  font:10px/1 var(--mono);
+  font-weight:400;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.motion-item small{
+  display:block;
+  margin-top:4px;
+  font:8px/1.3 var(--mono);
+  color:var(--muted);
+  white-space:nowrap;
+}
+.motion-note{
+  grid-column:1 / -1;
+  margin:7px 0 0;
+  padding-top:6px;
+  border-top:1px solid var(--line-soft);
+  font:8.5px/1.5 var(--body);
+  color:var(--muted);
+}
+
+/* ── 组件状态条 ─────────────────────────────────────── */
+.strip{
+  margin-top:12px;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--line-soft);
+}
+.strip-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding:7px 0 6px;
+}
+.strip-head .title-group{display:flex;align-items:baseline;gap:10px}
+.strip-head h2{margin:0;font:600 15px/1.2 var(--display);letter-spacing:.02em}
+.strip-head p{margin:0;font:8.5px/1.4 var(--body);color:var(--muted)}
+.strip-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line-soft);
+}
+.specimen{
+  min-width:0;
+  padding:9px 12px 8px;
+  border-right:1px solid var(--line-soft);
+}
+.specimen:nth-child(4n){border-right:0}
+.specimen:nth-child(n+5){border-top:1px solid var(--line-soft)}
+.spec-stage{
+  position:relative;
+  height:66px;
+  align-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.mini-stack{display:flex;flex-direction:column;align-items:center;gap:3px}
+.spec-stage.stage-bottom{align-items:flex-end}
+.mini-label{font:7px/1 var(--mono);letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+.spec-cap{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:6px;
+  margin-top:5px;
+  font:8px/1.35 var(--mono);
+  letter-spacing:.02em;
+  color:var(--muted);
+}
+.spec-cap b{font:600 9.5px/1.35 var(--body);color:var(--ink);letter-spacing:0;white-space:nowrap}
+.spec-cap span{text-align:right}
+.mini-felt{
+  position:relative;
+  display:grid;
+  place-items:center;
+  background:var(--felt);
+  box-shadow:inset 0 0 0 1px rgba(6,16,10,.45);
+}
+.mini-felt.lg{width:50px;height:50px}
+.mini-felt.sm{width:35px;height:35px}
+.mini-stone{position:relative;display:grid;place-items:center;border-radius:50%;background:radial-gradient(ellipse at 35% 25%,#3a3b37,var(--black) 56%,#080a08 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.26),inset 0 -2px 2px rgba(0,0,0,.6),0 1px 1px rgba(10,14,10,.4)}
+.mini-felt.lg .mini-stone{width:40px;height:40px}
+.mini-felt.sm .mini-stone{width:28px;height:28px}
+.mini-seal{
+  position:absolute;
+  right:-5px;bottom:-5px;
+  display:grid;place-items:center;
+  background:var(--seal);
+  border:1.5px solid var(--ivory);
+  color:var(--ivory);
+  font-family:var(--display);
+  font-weight:600;
+  transform:rotate(-3deg);
+  box-shadow:0 1px 2px rgba(10,14,10,.28);
+}
+.mini-felt.lg .mini-seal{width:19px;height:19px;font-size:10px;line-height:1}
+.mini-felt.sm .mini-seal{width:16px;height:16px;font-size:9px;line-height:1;right:-4px;bottom:-4px;border-width:1.2px}
+.mini-ring{position:absolute;inset:1.5px;border:1px solid rgba(185,77,53,.7);border-radius:50%}
+
+.mini-hint{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--brass);
+  box-shadow:0 0 0 4px rgba(187,146,80,.26),0 0 7px 1px rgba(187,146,80,.2);
+}
+.mini-ghost{
+  width:40px;height:40px;border-radius:50%;opacity:.52;
+  background:radial-gradient(ellipse at 35% 25%,#3a3b37,var(--black) 56%,#080a08 100%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.26),inset 0 -2px 2px rgba(0,0,0,.6);
+}
+.mini-skill{display:flex;align-items:center;gap:7px}
+.mini-icon{
+  width:34px;height:34px;
+  display:grid;place-items:center;
+  border:1px solid var(--line);
+  color:var(--cinnabar);
+  background:var(--paper-hi);
+}
+.mini-icon svg{width:20px;height:20px}
+.mini-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:30px;
+  padding:0 9px;
+  border:1px solid rgba(29,43,37,.42);
+  border-radius:2px;
+  background:transparent;
+  font:9.5px/1 var(--body);
+  color:var(--ink);
+  white-space:nowrap;
+}
+.mini-btn.is-disabled{
+  border-color:rgba(29,43,37,.22);
+  background:rgba(29,43,37,.025);
+  color:color-mix(in srgb,var(--ink) 72%,var(--paper));
+}
+.mini-disabled-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.mini-disabled-note{font:7.5px/1 var(--mono);color:var(--muted)}
+.mini-energy-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.mini-tokens{display:flex;gap:6px}
+.mini-tokens .token{width:9px;height:9px}
+.mini-count{font:8.5px/1 var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.energy-demo{
+  position:relative;
+  width:100%;
+  height:54px;
+  padding:0;
+  border:0;
+  border-radius:2px;
+  background:transparent;
+  cursor:pointer;
+}
+.energy-demo:hover{background:rgba(29,43,37,.035)}
+.energy-demo:active{background:rgba(29,43,37,.06)}
+.energy-demo:focus-visible{outline:2px solid var(--brass);outline-offset:-2px}
+.energy-demo .mini-energy-wrap{height:100%;justify-content:center}
+.plus{
+  position:absolute;
+  left:50%;
+  top:3px;
+  transform:translate(-50%,2px);
+  font:8.5px/1 var(--mono);
+  color:var(--ink);
+  opacity:0;
+  pointer-events:none;
+}
+.plus.on{animation:plus 280ms ease-out}
+.mini-tools{display:flex;align-items:center;gap:5px}
+.mini-tool{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:32px;
+  border:1px solid var(--line-soft);
+  border-radius:2px;
+  background:var(--paper);
+  font:9px/1 var(--body);
+  color:var(--ink);
+}
+.mini-tool.is-focus{box-shadow:inset 0 0 0 2px var(--brass);border-color:transparent}
+.mini-tool.is-press{background:color-mix(in srgb,var(--ink) 7%,var(--paper));transform:scale(.94)}
+
+.mini-cta-pair{display:flex;flex-direction:column;gap:5px;width:118px}
+.mini-cta{
+  display:grid;
+  place-items:center;
+  height:25px;
+  border-radius:2px;
+  font:8.5px/1 var(--body);
+  letter-spacing:.03em;
+}
+.mini-cta.is-disabled{
+  border:1px solid rgba(29,43,37,.22);
+  background:var(--paper);
+  color:color-mix(in srgb,var(--ink) 72%,var(--paper));
+}
+.mini-cta.is-ready{
+  border:1px solid var(--felt-deep);
+  background:var(--felt);
+  color:var(--ivory);
+  box-shadow:0 2px 0 var(--felt-deep);
+}
+.mini-tabbar{
+  display:flex;
+  width:100%;
+  border-top:1px solid var(--line-soft);
+  background:var(--paper);
+}
+.mini-tab{
+  position:relative;
+  flex:1;
+  min-width:0;
+  height:44px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  font:7.5px/1 var(--body);
+  color:var(--muted);
+  white-space:nowrap;
+}
+.mini-tab svg{width:14px;height:14px;display:block;opacity:.72}
+.mini-tab.is-active{color:var(--ink)}
+.mini-tab.is-active svg{opacity:1}
+.mini-tab.is-active::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:14px;
+  height:2px;
+  transform:translateX(-50%);
+  background:var(--brass);
+}
+.mini-tab.is-focus{box-shadow:inset 0 0 0 2px var(--brass);color:var(--ink)}
+.mini-tab.is-focus svg{opacity:1}
+.specimen-hint{margin-top:5px;text-align:center;font:7.5px/1.3 var(--mono);color:var(--muted)}
+
+/* ── 页脚 ───────────────────────────────────────────── */
+.page-foot{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:20px;
+  margin-top:13px;
+  padding-top:7px;
+  border-top:1px solid var(--line-soft);
+  font:8.5px/1.5 var(--mono);
+  letter-spacing:.02em;
+  color:var(--muted);
+}
+.page-foot .strong{color:var(--ink)}
+
+/* ── 动效 ───────────────────────────────────────────── */
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.56}}
+@keyframes seal-in{0%{opacity:0;transform:rotate(-3deg) scale(.72)}100%{opacity:1;transform:rotate(-3deg) scale(1)}}
+@keyframes bump{0%{transform:scale(1)}36%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,3px)}28%{opacity:1}100%{opacity:0;transform:translate(-50%,-7px)}}
+@keyframes caret{0%,55%{opacity:1}56%,100%{opacity:.45}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+.sheet.no-motion *,
+.sheet.no-motion *::before,
+.sheet.no-motion *::after{animation:none!important;transition:none!important}
+</style>
+</head>
+<body>
+<div class="sheet" id="polish-board" data-od-id="polish-board">
+
+  <header class="masthead" data-od-id="masthead">
+    <div>
+      <span class="kicker">翻盘棋 / 细节精修 · 390 宽</span>
+      <h1>把细处，落到棋盘上。</h1>
+    </div>
+    <div class="mast-right">
+      <p class="mast-lede">两张 390 × 844 对照稿：A 技能局 4 : 1，黑棋第 02 手；B 加入房间已输入 784。右侧给出尺寸、色值与状态时长，全部落在同一套纸、毡、墨、黄铜与朱砂里。</p>
+      <div class="mast-seal" aria-label="精修对照稿">
+        <span class="seal-mark">精修</span>
+        <small>2026.11</small>
+      </div>
+    </div>
+  </header>
+
+  <main class="board-grid">
+
+    <section class="left-col" aria-label="两张手机对照稿">
+
+      <div class="phones">
+
+        <!-- A · 技能局 -->
+        <figure class="phone-card" data-od-id="phone-a-card">
+          <figcaption class="phone-label">
+            <span class="tag"><i>A</i> 技能局 · 进行中</span>
+            <span class="dims">390 × 844</span>
+          </figcaption>
+          <div class="phone">
+            <div class="screen" id="screen-a" aria-label="技能局进行中：黑棋 4 比 1 白棋，黑棋第 02 手，末手 D3，能量 4/6。">
+              <div class="statusbar" aria-hidden="true">
+                <span class="time">9:41</span>
+                <span class="status-icons">
+                  <svg viewBox="0 0 17 12" fill="currentColor"><rect x="1" y="7" width="2.5" height="4"/><rect x="5" y="5" width="2.5" height="6"/><rect x="9" y="3" width="2.5" height="8"/><rect x="13" y="1" width="2.5" height="10"/></svg>
+                  <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><path d="M1.2 4.4a9.7 9.7 0 0 1 13.6 0"/><path d="M3.7 7a6.2 6.2 0 0 1 8.6 0"/><path d="M6.1 9.5a2.9 2.9 0 0 1 3.8 0"/><circle cx="8" cy="11" r=".8" fill="currentColor" stroke="none"/></svg>
+                  <svg viewBox="0 0 26 12" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="2" width="21" height="8" rx="1.5"/><rect x="3" y="4" width="15" height="4" rx=".5" fill="currentColor" stroke="none"/><path d="M24 4.5v3"/></svg>
+                </span>
+              </div>
+
+              <div class="navbar">
+                <span class="nav-back" aria-hidden="true">
+                  <svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 1.5 1.5 7.5l6 6"/></svg>
+                </span>
+                <span class="nav-title">对局</span>
+                <span class="capsule" aria-hidden="true">
+                  <span class="caps-dots"><i></i><i></i><i></i></span>
+                  <span class="caps-div"></span>
+                  <span class="caps-ring"><i></i></span>
+                </span>
+              </div>
+
+              <div class="game-content">
+                <div class="score-head" data-od-id="score-head">
+                  <div class="eyebrow-row">
+                    <span class="live"><i></i>技能局 · 进行中</span>
+                    <span>第 02 手</span>
+                  </div>
+                  <div class="score-row">
+                    <div class="side black">
+                      <span class="stone" aria-hidden="true"></span>
+                      <span class="side-text"><strong>你</strong><small>执黑</small></span>
+                    </div>
+                    <div class="score">
+                      <span class="score-label">比分</span>
+                      <div class="score-nums" aria-hidden="true">
+                        <span class="score-num" id="score-black">4</span>
+                        <em>:</em>
+                        <span class="score-num" id="score-white">1</span>
+                      </div>
+                    </div>
+                    <div class="side white">
+                      <span class="side-text"><strong>白棋</strong><small>对手</small></span>
+                      <span class="stone white" aria-hidden="true"></span>
+                    </div>
+                  </div>
+                  <div class="turn-line">
+                    <span class="turn-dot" aria-hidden="true"></span>
+                    <span>黑棋落子</span>
+                    <span class="last-mini">末手 D3</span>
+                  </div>
+                </div>
+
+                <div class="board-wrap" data-od-id="board-a">
+                  <div class="board" id="board-a" role="img" aria-label="棋盘：黑棋 4 子，白棋 1 子；末手 D3；黑棋落子，三处合法落点。"></div>
+                </div>
+
+                <div class="board-meta">
+                  <span class="legal-count"><i></i>3 处合法落点</span>
+                  <span>末手 D3 · 第 02 手</span>
+                </div>
+
+                <div class="game-spacer" aria-hidden="true"></div>
+
+                <div class="energy-row" data-od-id="energy-a">
+                  <span class="energy-label">能量</span>
+                  <div class="tokens" id="energy-a" role="img" aria-label="能量 4/6"></div>
+                  <span class="energy-count"><b id="energy-a-count">4</b><em>/6</em></span>
+                </div>
+
+                <div class="skill-card" id="skill-card" data-state="default" data-od-id="skill-card">
+                  <span class="skill-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                      <circle cx="12" cy="12" r="5.2"/>
+                      <path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4" stroke-linecap="round"/>
+                      <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+                    </svg>
+                  </span>
+                  <span class="skill-copy">
+                    <strong>十字爆破</strong>
+                    <small id="skill-meta">3 点能量 · 十字额外翻转</small>
+                  </span>
+                  <button class="skill-btn" id="skill-btn" type="button">发动</button>
+                </div>
+
+                <p class="game-hint" id="game-hint">点按黄铜光点落子 · 技能可随时发动</p>
+              </div>
+
+              <div class="game-tools" role="toolbar" aria-label="对局操作" data-od-id="game-toolbar">
+                <button class="tool" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5a5 5 0 1 1 1.4 3.7"/><path d="M3 3.5v4h4"/></svg>
+                  悔棋
+                </button>
+                <button class="tool" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2.5 3.5h11v9h-11z"/><path d="M5 6h6M5 8.5h6M5 11h3.5"/></svg>
+                  棋谱
+                </button>
+                <button class="tool" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14V2.5"/><path d="M4 3h7.5l-1.4 2.5L11.5 8H4"/></svg>
+                  认输
+                </button>
+                <button class="tool" type="button">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h2.5L9 3.5v9L5.5 9.5H3z"/><path d="M11.2 5.8a3 3 0 0 1 0 4.4M12.8 4.2a5.3 5.3 0 0 1 0 7.6"/></svg>
+                  声音与动效
+                </button>
+              </div>
+
+              <span class="home" aria-hidden="true"></span>
+            </div>
+          </div>
+        </figure>
+
+        <!-- B · 加入房间 -->
+        <figure class="phone-card" data-od-id="phone-b-card">
+          <figcaption class="phone-label">
+            <span class="tag"><i>B</i> 加入房间 · 已输入 784</span>
+            <span class="dims">390 × 844</span>
+          </figcaption>
+          <div class="phone">
+            <div class="screen" id="screen-b">
+              <div class="statusbar" aria-hidden="true">
+                <span class="time">9:41</span>
+                <span class="status-icons">
+                  <svg viewBox="0 0 17 12" fill="currentColor"><rect x="1" y="7" width="2.5" height="4"/><rect x="5" y="5" width="2.5" height="6"/><rect x="9" y="3" width="2.5" height="8"/><rect x="13" y="1" width="2.5" height="10"/></svg>
+                  <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><path d="M1.2 4.4a9.7 9.7 0 0 1 13.6 0"/><path d="M3.7 7a6.2 6.2 0 0 1 8.6 0"/><path d="M6.1 9.5a2.9 2.9 0 0 1 3.8 0"/><circle cx="8" cy="11" r=".8" fill="currentColor" stroke="none"/></svg>
+                  <svg viewBox="0 0 26 12" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="2" width="21" height="8" rx="1.5"/><rect x="3" y="4" width="15" height="4" rx=".5" fill="currentColor" stroke="none"/><path d="M24 4.5v3"/></svg>
+                </span>
+              </div>
+
+              <div class="navbar">
+                <span class="nav-back" aria-hidden="true">
+                  <svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 1.5 1.5 7.5l6 6"/></svg>
+                </span>
+                <span class="nav-title">加入棋桌</span>
+                <span class="capsule" aria-hidden="true">
+                  <span class="caps-dots"><i></i><i></i><i></i></span>
+                  <span class="caps-div"></span>
+                  <span class="caps-ring"><i></i></span>
+                </span>
+              </div>
+
+              <div class="join-content" data-od-id="join-room">
+                <div class="join-head">
+                  <span class="kicker">加入棋桌 / 六位房间号</span>
+                  <h1>请房主开门。</h1>
+                  <p>输入房主分享的六位数字，确认后即可入座。这是本地原型，不连接真实房间。</p>
+                </div>
+
+                <div class="join-label-row">
+                  <span>房间号</span>
+                  <span class="count" id="join-count">3 / 6</span>
+                </div>
+
+                <div class="digits" id="join-digits" role="group" aria-label="房间号，已输入 784，还差 3 位" aria-live="polite"></div>
+
+                <div class="paste-row">
+                  <span class="paste-hint" id="paste-hint" aria-live="polite">也可以从剪贴板粘贴</span>
+                  <button class="paste-btn" id="paste-btn" type="button">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="8" height="11" rx="1"/><path d="M6.5 3V2h3v1"/><path d="M6.5 7h3M6.5 9.5h3"/></svg>
+                    粘贴房间号
+                  </button>
+                </div>
+
+                <div class="join-note">
+                  <i aria-hidden="true"></i>
+                  <div>
+                    <strong>入座说明</strong>
+                    <small>房主确认后入座；原型不发起真实联机，也不会产生房间记录。</small>
+                  </div>
+                </div>
+
+                <div class="join-spacer"></div>
+
+                <div class="keypad" id="keypad" data-od-id="join-keypad" aria-label="数字键盘">
+                  <button class="key" type="button" data-key="1">1</button>
+                  <button class="key" type="button" data-key="2">2</button>
+                  <button class="key" type="button" data-key="3">3</button>
+                  <button class="key" type="button" data-key="4">4</button>
+                  <button class="key" type="button" data-key="5">5</button>
+                  <button class="key" type="button" data-key="6">6</button>
+                  <button class="key" type="button" data-key="7">7</button>
+                  <button class="key" type="button" data-key="8">8</button>
+                  <button class="key" type="button" data-key="9">9</button>
+                  <button class="key word" type="button" data-key="clear">清空</button>
+                  <button class="key" type="button" data-key="0">0</button>
+                  <button class="key word" type="button" data-key="del">退格</button>
+                </div>
+
+                <button class="join-cta" id="join-cta" type="button" disabled data-od-id="join-cta">加入棋桌</button>
+                <p class="join-caption" id="join-caption" aria-live="polite">还差 3 位数字</p>
+              </div>
+
+              <span class="home" aria-hidden="true"></span>
+            </div>
+          </div>
+        </figure>
+
+      </div>
+
+      <!-- 组件状态条 -->
+      <section class="strip" data-od-id="component-strip">
+        <div class="strip-head">
+          <div class="title-group">
+            <span class="mini-kicker">状态样本 · 08</span>
+            <h2>组件状态</h2>
+          </div>
+          <p>点击能量格演示 +1；其余为静态状态样本。</p>
+        </div>
+        <div class="strip-grid">
+
+          <div class="specimen" data-od-id="spec-last-seal">
+            <div class="spec-stage stage-bottom">
+              <div class="mini-stack">
+                <span class="mini-label">390</span>
+                <div class="mini-felt lg">
+                  <span class="mini-stone"><span class="mini-ring"></span><span class="mini-seal">末</span></span>
+                </div>
+              </div>
+              <div class="mini-stack">
+                <span class="mini-label">320</span>
+                <div class="mini-felt sm">
+                  <span class="mini-stone"><span class="mini-ring"></span><span class="mini-seal">末</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="spec-cap"><b>末手印</b><span>19 / 16 · 字 10 / 9</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-legal">
+            <div class="spec-stage">
+              <div class="mini-stack">
+                <span class="mini-label">静止</span>
+                <div class="mini-felt lg"><span class="mini-hint"></span></div>
+              </div>
+              <div class="mini-stack">
+                <span class="mini-label">悬停</span>
+                <div class="mini-felt lg"><span class="mini-ghost"></span></div>
+              </div>
+            </div>
+            <div class="spec-cap"><b>合法落点</b><span>5px 点 / 76% 预演</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-armed">
+            <div class="spec-stage">
+              <div class="mini-skill">
+                <span class="mini-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                    <circle cx="12" cy="12" r="5.2"/>
+                    <path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+                  </svg>
+                </span>
+                <span class="mini-btn">取消瞄准</span>
+              </div>
+            </div>
+            <div class="spec-cap"><b>已瞄准</b><span>准星 180ms 转朱砂</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-disabled">
+            <div class="spec-stage">
+              <div class="mini-disabled-wrap">
+                <span class="mini-btn is-disabled">发动</span>
+                <span class="mini-disabled-note">能量 2/6 · 差 1 点</span>
+              </div>
+            </div>
+            <div class="spec-cap"><b>禁用</b><span>墨 72% · 5.2:1</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-energy">
+            <div class="spec-stage">
+              <button class="energy-demo" id="energy-demo" type="button" aria-label="能量 4/6，点按获得 1 点">
+                <span class="plus" id="plus-demo" aria-hidden="true">+1</span>
+                <span class="mini-energy-wrap">
+                  <span class="mini-tokens" id="energy-demo-tokens" aria-hidden="true"></span>
+                  <span class="mini-count" id="energy-demo-count">4 / 6</span>
+                </span>
+              </button>
+            </div>
+            <div class="spec-cap"><b>能量 +1</b><span>280ms · 4/6 → 5/6</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-toolbar">
+            <div class="spec-stage">
+              <div class="mini-tools">
+                <span class="mini-tool is-focus">悔棋</span>
+                <span class="mini-tool is-press">棋谱</span>
+                <span class="mini-tool">认输</span>
+              </div>
+            </div>
+            <div class="spec-cap"><b>工具栏</b><span>聚焦 / 按压</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-cta">
+            <div class="spec-stage">
+              <div class="mini-cta-pair">
+                <span class="mini-cta is-disabled">加入棋桌</span>
+                <span class="mini-cta is-ready">加入棋桌</span>
+              </div>
+            </div>
+            <div class="spec-cap"><b>主按钮</b><span>禁用 / 六位齐</span></div>
+          </div>
+
+          <div class="specimen" data-od-id="spec-tabbar">
+            <div class="spec-stage">
+              <div class="mini-tabbar" aria-hidden="true">
+                <span class="mini-tab is-active">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+                  棋局
+                </span>
+                <span class="mini-tab is-focus">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h6v3.5a3 3 0 0 1-6 0z"/><path d="M5 4H3v1.5A2.5 2.5 0 0 0 5.5 8M11 4h2v1.5A2.5 2.5 0 0 1 10.5 8"/><path d="M8 9v3M5.5 14h5"/></svg>
+                  战绩
+                </span>
+                <span class="mini-tab">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="8" cy="5.5" r="2.6"/><path d="M3 14c.6-3 2.4-4.4 5-4.4s4.4 1.4 5 4.4"/></svg>
+                  我的
+                </span>
+              </div>
+            </div>
+            <div class="spec-cap"><b>底栏</b><span>44px · 选中 / 聚焦</span></div>
+          </div>
+
+        </div>
+      </section>
+    </section>
+
+    <!-- 右侧标注 -->
+    <aside class="notes" data-od-id="detail-notes" aria-label="细节标注">
+      <div class="spec-top">
+        <div>
+          <span class="mini-kicker">规格 / 390 宽</span>
+          <h2>细节标注</h2>
+        </div>
+        <span class="range">01—07</span>
+      </div>
+
+      <div class="demo-controls" data-od-id="state-controls">
+        <div class="control-row">
+          <span class="control-label">A · 技能状态</span>
+          <div class="seg" role="group" aria-label="切换 A 屏技能状态">
+            <button type="button" data-skill-state="default" aria-pressed="true">默认</button>
+            <button type="button" data-skill-state="armed" aria-pressed="false">已瞄准</button>
+            <button type="button" data-skill-state="disabled" aria-pressed="false">能量不足</button>
+          </div>
+        </div>
+        <div class="control-row">
+          <span class="control-label">演示</span>
+          <button class="demo-btn" id="score-demo" type="button">比分 +1</button>
+          <button class="demo-btn" id="motion-toggle" type="button" aria-pressed="true"><span class="dot on"></span>动效 开</button>
+        </div>
+        <p class="control-note">点按状态可切换 A 屏技能栏三态；「比分 +1」演示数字跳动。系统要求减少动态效果时自动静止，信息与状态全部保留。</p>
+      </div>
+
+      <article class="note" data-od-id="note-01">
+        <header class="note-head">
+          <span class="n">01</span>
+          <h3>末手印</h3>
+          <span class="tag">A · 棋盘</span>
+        </header>
+        <p>7px 字压在棋子中央，既挤又糊。把印移到右下缘，印外留纸边，印内只放一个字；棋子上再加一圈 1px 朱砂细环，末手在远处也能一眼找到。</p>
+        <dl class="spec-list">
+          <div><dt>尺寸</dt><dd><code>19 × 19</code><span class="sep">·</span>字 <code>10px / 600</code> 宋体<span class="sep">·</span>320 宽降为 <code>16</code> / <code>9px</code></dd></div>
+          <div><dt>位置</dt><dd>棋子右下 <code>-5px</code><span class="sep">·</span>旋转 <code>-3°</code><span class="sep">·</span>纸边 <code>1.5px</code></dd></div>
+          <div><dt>颜色</dt><dd>印底 <code>#a8412c</code>（朱砂压 12% 墨）<span class="sep">·</span>字 <code>#f4eddc</code><span class="sep">·</span>环 <code>#b94d35</code> 72%</dd></div>
+          <div><dt>动效</dt><dd><code>220ms</code> 盖印 <code>.72 → 1</code><span class="sep">·</span>减少动态时直接呈现</dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-02">
+        <header class="note-head">
+          <span class="n">02</span>
+          <h3>合法落点</h3>
+          <span class="tag">A · 棋盘</span>
+        </header>
+        <p>5px 黄铜点，加一圈 1px 细环和一层很轻的辉光；呼吸只改透明度、不缩放，8 × 8 仍安静。悬停才出现 76% 的半透明预演子，触屏不触发。</p>
+        <dl class="spec-list">
+          <div><dt>点</dt><dd><code>5px</code><span class="sep">·</span>环 <code>15px / 1px</code><span class="sep">·</span>辉光 <code>9px</code> 14%</dd></div>
+          <div><dt>呼吸</dt><dd><code>2.8s</code> 循环，透明度 <code>.58 ↔ 1</code>，逐个错开 <code>180ms</code></dd></div>
+          <div><dt>悬停</dt><dd>预演子 <code>76%</code>，<code>透明度 .52</code>，<code>160ms</code>；触屏不触发</dd></div>
+          <div><dt>计数</dt><dd>本局 3 处；超过 12 处也不增加动画数量</dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-03">
+        <header class="note-head">
+          <span class="n">03</span>
+          <h3>比分头部</h3>
+          <span class="tag">A · 顶部</span>
+        </header>
+        <p>黑在左、白在右、比分居中，轮次与末手另起一行，读起来像棋谱而不是仪表盘。数字只在变化时轻轻一跳。</p>
+        <dl class="spec-list">
+          <div><dt>数字</dt><dd><code>30px</code> 宋体，等宽数字<span class="sep">·</span>名字 <code>12.5px</code>，注 <code>8.5px</code></dd></div>
+          <div><dt>层级</dt><dd>眉题 <code>8.5px</code> 等宽<span class="sep">·</span>轮次行 <code>10px</code> + 1px 分隔线</dd></div>
+          <div><dt>动效</dt><dd><code>320ms</code>，仅变动数字 <code>1 → 1.06 → 1</code></dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-04">
+        <header class="note-head">
+          <span class="n">04</span>
+          <h3>能量</h3>
+          <span class="tag">A · 棋盘下</span>
+        </header>
+        <p>六格电池条改成六枚黄铜记数子：亮的是能量，空的是余位，4/6 一眼可数。+1 只让新亮的那枚跳一下，不做整排闪光。</p>
+        <dl class="spec-list">
+          <div><dt>记数子</dt><dd><code>9px</code>，间距 <code>7px</code><span class="sep">·</span>亮 <code>#bb9250</code><span class="sep">·</span>空 1px 黄铜 40%</dd></div>
+          <div><dt>计数</dt><dd><code>9.5px</code> 等宽，右对齐<span class="sep">·</span><code>4 / 6</code></dd></div>
+          <div><dt>动效</dt><dd><code>280ms</code>，<code>1.35 → 1</code><span class="sep">·</span><code>+1</code> 上浮 10px 淡出</dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-05">
+        <header class="note-head">
+          <span class="n">05</span>
+          <h3>技能栏</h3>
+          <span class="tag">A · 技能栏</span>
+        </header>
+        <p>默认只有一条细线和一颗墨色准星；已瞄准时准星转朱砂，按钮仍是中性纸底；禁用时把文字压到 72% 墨，不做反白淡绿。</p>
+        <dl class="spec-list">
+          <div><dt>按钮</dt><dd><code>92 × 44</code><span class="sep">·</span>默认 / 取消均中性<span class="sep">·</span>聚焦 2px 黄铜</dd></div>
+          <div><dt>准星</dt><dd><code>34px</code> 框，<code>21px</code> 图标<span class="sep">·</span>已瞄准 <code>180ms</code> 转朱砂</dd></div>
+          <div><dt>禁用</dt><dd>字 <span class="ok">墨 72%（5.2:1）</span><span class="sep">·</span>能量 2/6<span class="sep">·</span>注「还差 1 点」</dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-06">
+        <header class="note-head">
+          <span class="n">06</span>
+          <h3>加入房间</h3>
+          <span class="tag">B · 整页</span>
+        </header>
+        <p>当前位不再用朱砂下划线（像报错），改为黄铜内框加墨色细光标。补上粘贴入口和 44px 键位，六位齐时才点亮主按钮。</p>
+        <dl class="spec-list">
+          <div><dt>格</dt><dd>六列 <code>1fr</code>，<code>56px</code> 高，间距 <code>8px</code><span class="sep">·</span>数字 <code>26px</code> 宋体</dd></div>
+          <div><dt>当前位</dt><dd>内框 <code>1.5px</code> 黄铜<span class="sep">·</span>光标 <code>1.5 × 20px</code>，<code>1.1s</code> 闪</dd></div>
+          <div><dt>键位</dt><dd><code>54px</code>，按压 <code>.97</code> + 墨 7%，<code>120ms</code><span class="sep">·</span>聚焦 2px 黄铜</dd></div>
+          <div><dt>主按钮</dt><dd><code>48px</code><span class="sep">·</span>禁用纸底 / 墨 72% / 1px 边<span class="sep">·</span>六位齐转松绿</dd></div>
+        </dl>
+      </article>
+
+      <article class="note" data-od-id="note-07">
+        <header class="note-head">
+          <span class="n">07</span>
+          <h3>工具栏 / 底栏</h3>
+          <span class="tag">A / B · 底部</span>
+        </header>
+        <p>对局工具栏、底部导航和加入页键盘共用一套规则：44px 目标，按压 .94，聚焦 2px 黄铜内框；不为每个按钮发明新反馈。</p>
+        <dl class="spec-list">
+          <div><dt>目标</dt><dd>最小 <code>44 × 44px</code><span class="sep">·</span>图标 <code>14–23px</code><span class="sep">·</span>标签 <code>9.5–10px</code></dd></div>
+          <div><dt>按压</dt><dd><code>160ms</code>，<code>.94</code>，墨 6%<span class="sep">·</span>键盘 <code>.97</code>，<code>120ms</code></dd></div>
+          <div><dt>聚焦</dt><dd><code>2px</code> 黄铜，偏移 <code>-3px</code> 内框<span class="sep">·</span>不改变布局</dd></div>
+          <div><dt>禁用</dt><dd>45% 透明，仍保留 1px 边与文字</dd></div>
+        </dl>
+      </article>
+
+    </aside>
+  </main>
+
+  <section class="motion-band" data-od-id="motion-band" aria-label="动效时长总表">
+    <div class="motion-title">
+      <span class="mini-kicker">动效 / 120–320 毫秒</span>
+      <h2>动效时长</h2>
+    </div>
+    <div class="motion-items">
+      <div class="motion-item"><span class="m-label">按压 / 回弹</span><b>120–160ms</b><small>缩放 .94–.97</small></div>
+      <div class="motion-item"><span class="m-label">悬停预演</span><b>160ms</b><small>透明度 0 → .52</small></div>
+      <div class="motion-item"><span class="m-label">准星进入</span><b>180ms</b><small>墨 → 朱砂</small></div>
+      <div class="motion-item"><span class="m-label">末手盖印</span><b>220ms</b><small>.72 → 1</small></div>
+      <div class="motion-item"><span class="m-label">能量 +1</span><b>280ms</b><small>1.35 → 1 / 上浮 10px</small></div>
+      <div class="motion-item"><span class="m-label">比分跳动</span><b>320ms</b><small>1 → 1.06 → 1</small></div>
+      <div class="motion-item"><span class="m-label">循环提示</span><b>2.8s / 1.1s</b><small>呼吸 / 光标 · 非反馈</small></div>
+    </div>
+    <p class="motion-note">交互反馈全部落在 120–320ms；呼吸与光标是循环提示，不计入反馈时长。系统「减少动态效果」与「动效关」下全部瞬时，状态和文字不丢失。</p>
+  </section>
+
+  <footer class="page-foot" data-od-id="page-footer">
+    <span><span class="strong">翻盘棋 · 精修对照稿</span> / 2026.11 / 390 × 844 × 2</span>
+    <span>朱砂仅用于末手印、已瞄准准星与页首印章</span>
+    <span>自包含：无外部字体、图片、脚本 · 未改动 index.html</span>
+  </footer>
+</div>
+
+<span class="sr-only" id="skill-live" aria-live="polite"></span>
+<span class="sr-only" id="score-live" aria-live="polite"></span>
+<span class="sr-only" id="demo-live" aria-live="polite"></span>
+
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(sel, root){ return (root || document).querySelector(sel); };
+  var $$ = function(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+  var sheet = $("#polish-board");
+
+  /* ── A 屏棋盘 ─────────────────────────────── */
+  var stones = { 19: "black", 27: "black", 28: "black", 35: "black", 36: "white" };
+  var legal = [37, 45, 44];
+  var board = $("#board-a");
+  if (board) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 64; i++) {
+      var cell = document.createElement("div");
+      cell.className = "cell";
+      cell.setAttribute("data-index", String(i));
+      if (stones[i]) {
+        var st = document.createElement("span");
+        st.className = "stone" + (stones[i] === "white" ? " white" : "");
+        if (i === 19) {
+          cell.classList.add("last");
+          var ring = document.createElement("span");
+          ring.className = "last-ring";
+          var seal = document.createElement("span");
+          seal.className = "last-seal";
+          seal.textContent = "末";
+          st.appendChild(ring);
+          st.appendChild(seal);
+        }
+        cell.appendChild(st);
+      }
+      if (legal.indexOf(i) !== -1) {
+        cell.classList.add("legal");
+        var hint = document.createElement("span");
+        hint.className = "hint";
+        hint.style.setProperty("--d", (legal.indexOf(i) * 0.18) + "s");
+        var ghost = document.createElement("span");
+        ghost.className = "stone ghost";
+        cell.appendChild(ghost);
+        cell.appendChild(hint);
+      }
+      frag.appendChild(cell);
+    }
+    board.appendChild(frag);
+  }
+
+  /* ── 能量 ─────────────────────────────────── */
+  var energyBox = $("#energy-a");
+  var energyCount = $("#energy-a-count");
+  function ensureTokens(box) {
+    if (!box) return [];
+    if (box.children.length === 6) return Array.prototype.slice.call(box.children);
+    box.innerHTML = "";
+    for (var i = 0; i < 6; i++) {
+      var t = document.createElement("span");
+      t.className = "token";
+      box.appendChild(t);
+    }
+    return Array.prototype.slice.call(box.children);
+  }
+  function paintTokens(tokens, lit) {
+    tokens.forEach(function(t, i){ t.classList.toggle("on", i < lit); });
+  }
+  function renderEnergy(lit) {
+    if (!energyBox) return;
+    paintTokens(ensureTokens(energyBox), lit);
+    energyBox.setAttribute("aria-label", "能量 " + lit + "/6");
+    if (energyCount) energyCount.textContent = String(lit);
+  }
+  renderEnergy(4);
+
+  /* ── 技能三态 ─────────────────────────────── */
+  var card = $("#skill-card");
+  var skillBtn = $("#skill-btn");
+  var skillMeta = $("#skill-meta");
+  var gameHint = $("#game-hint");
+  var skillState = "default";
+  var stateCopy = {
+    default: { btn: "发动", meta: "3 点能量 · 十字额外翻转", hint: "点按黄铜光点落子 · 技能可随时发动", live: "技能待发，能量 4/6。" },
+    armed: { btn: "取消瞄准", meta: "已瞄准 · 点光点释放", hint: "十字爆破已瞄准：点任一光点释放", live: "十字爆破已瞄准，准星为朱砂色。" },
+    disabled: { btn: "发动", meta: "3 点能量 · 还差 1 点", hint: "能量不足：还差 1 点，暂不可发动", live: "能量不足，技能不可发动。" }
+  };
+
+  function setSkillState(state, announce) {
+    if (!card || !skillBtn) return;
+    skillState = state;
+    card.setAttribute("data-state", state);
+    $$("[data-skill-state]").forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-skill-state") === state ? "true" : "false");
+    });
+    var copy = stateCopy[state];
+    skillBtn.textContent = copy.btn;
+    skillBtn.disabled = state === "disabled";
+    if (skillMeta) skillMeta.textContent = copy.meta;
+    if (gameHint) gameHint.textContent = copy.hint;
+    renderEnergy(state === "disabled" ? 2 : 4);
+    if (announce !== false) {
+      var live = $("#skill-live");
+      if (live) live.textContent = copy.live;
+    }
+  }
+
+  $$("[data-skill-state]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      setSkillState(btn.getAttribute("data-skill-state"));
+    });
+  });
+  if (skillBtn) {
+    skillBtn.addEventListener("click", function(){
+      if (skillState === "disabled") return;
+      setSkillState(skillState === "armed" ? "default" : "armed");
+    });
+  }
+
+  /* ── 比分 +1 ──────────────────────────────── */
+  var blackScore = 4;
+  var whiteScore = 1;
+  var scoreDemo = $("#score-demo");
+  if (scoreDemo) {
+    scoreDemo.addEventListener("click", function(){
+      blackScore = Math.min(64, blackScore + 1);
+      var b = $("#score-black");
+      if (b) {
+        b.textContent = String(blackScore);
+        b.classList.remove("bump");
+        void b.offsetWidth;
+        b.classList.add("bump");
+        window.setTimeout(function(){ b.classList.remove("bump"); }, 340);
+      }
+      var live = $("#score-live");
+      if (live) live.textContent = "比分：黑 " + blackScore + "，白 " + whiteScore + "。";
+    });
+  }
+
+  /* ── 动效开关 ─────────────────────────────── */
+  var motionBtn = $("#motion-toggle");
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var motionOn = !(reduced && reduced.matches);
+
+  function setMotion(on) {
+    motionOn = on;
+    if (sheet) sheet.classList.toggle("no-motion", !on);
+    if (!motionBtn) return;
+    motionBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    motionBtn.innerHTML = '<span class="dot' + (on ? " on" : "") + '"></span>动效 ' + (on ? "开" : "关");
+  }
+  setMotion(motionOn);
+  if (motionBtn) {
+    motionBtn.addEventListener("click", function(){
+      if (reduced && reduced.matches) return;
+      setMotion(!motionOn);
+    });
+  }
+  if (reduced) {
+    var onPref = function(){
+      if (reduced.matches) {
+        setMotion(false);
+        if (motionBtn) {
+          motionBtn.disabled = true;
+          motionBtn.innerHTML = '<span class="dot"></span>动效 关 · 系统';
+        }
+      }
+    };
+    onPref();
+    if (reduced.addEventListener) reduced.addEventListener("change", onPref);
+    else if (reduced.addListener) reduced.addListener(onPref);
+  }
+
+  /* ── B 屏房间号 ───────────────────────────── */
+  var digits = "784";
+  var digitBoxes = $("#join-digits");
+  var countEl = $("#join-count");
+  var cta = $("#join-cta");
+  var caption = $("#join-caption");
+  var pasteHint = $("#paste-hint");
+
+  function renderJoin() {
+    if (!digitBoxes) return;
+    digitBoxes.innerHTML = "";
+    for (var i = 0; i < 6; i++) {
+      var box = document.createElement("span");
+      box.className = "digit";
+      var ch = digits.charAt(i);
+      if (ch) {
+        box.classList.add("filled");
+        box.textContent = ch;
+      } else if (i === digits.length && digits.length < 6) {
+        box.classList.add("active");
+        var caret = document.createElement("span");
+        caret.className = "caret";
+        box.appendChild(caret);
+      }
+      digitBoxes.appendChild(box);
+    }
+    var ready = digits.length === 6;
+    if (countEl) countEl.textContent = digits.length + " / 6";
+    digitBoxes.setAttribute("aria-label", "房间号，已输入 " + (digits || "空") + (ready ? "，六位已齐" : "，还差 " + (6 - digits.length) + " 位"));
+    if (cta) {
+      cta.disabled = !ready;
+      cta.classList.toggle("ready", ready);
+      cta.textContent = "加入棋桌";
+    }
+    if (caption) {
+      caption.classList.toggle("ready", ready);
+      caption.textContent = ready ? "六位已齐，可以入座" : "还差 " + (6 - digits.length) + " 位数字";
+    }
+    if (pasteHint) pasteHint.textContent = "也可以从剪贴板粘贴";
+  }
+
+  var keypad = $("#keypad");
+  if (keypad) {
+    keypad.addEventListener("click", function(e){
+      var key = e.target.closest("[data-key]");
+      if (!key) return;
+      var k = key.getAttribute("data-key");
+      if (k === "del") digits = digits.slice(0, -1);
+      else if (k === "clear") digits = "";
+      else if (/^[0-9]$/.test(k) && digits.length < 6) digits += k;
+      renderJoin();
+    });
+  }
+
+  function takePasted(text) {
+    var found = (String(text).match(/\d/g) || []).join("").slice(0, 6);
+    if (!found) return false;
+    digits = found;
+    renderJoin();
+    return true;
+  }
+
+  var pasteBtn = $("#paste-btn");
+  if (pasteBtn) {
+    pasteBtn.addEventListener("click", function(){
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText().then(function(text){
+          if (!takePasted(text) && pasteHint) pasteHint.textContent = "没有读到数字，请用 ⌘V 粘贴";
+        }).catch(function(){
+          if (pasteHint) pasteHint.textContent = "没有剪贴板权限，请用 ⌘V 粘贴";
+        });
+      } else if (pasteHint) {
+        pasteHint.textContent = "请用 ⌘V 粘贴六位数字";
+      }
+    });
+  }
+  document.addEventListener("paste", function(e){
+    var clip = e.clipboardData || window.clipboardData;
+    if (!clip || typeof clip.getData !== "function") return;
+    var text = clip.getData("text");
+    if (takePasted(text)) e.preventDefault();
+  });
+
+  if (cta) {
+    cta.addEventListener("click", function(){
+      if (digits.length !== 6) return;
+      if (caption) {
+        caption.classList.add("ready");
+        caption.innerHTML = '原型演示：不会真的连接房间。';
+      }
+    });
+  }
+
+  renderJoin();
+
+  /* ── 组件条能量 +1 ────────────────────────── */
+  var demoEnergy = 4;
+  var demoTokens = $("#energy-demo-tokens");
+  var demoCount = $("#energy-demo-count");
+  var demoBtn = $("#energy-demo");
+  function renderDemo() {
+    if (!demoTokens) return;
+    paintTokens(ensureTokens(demoTokens), demoEnergy);
+    if (demoCount) demoCount.textContent = demoEnergy + " / 6";
+    if (demoBtn) demoBtn.setAttribute("aria-label", "能量 " + demoEnergy + "/6，点按获得 1 点");
+  }
+  if (demoBtn) {
+    demoBtn.addEventListener("click", function(){
+      demoEnergy = demoEnergy >= 6 ? 4 : demoEnergy + 1;
+      renderDemo();
+      var plus = $("#plus-demo");
+      if (plus) {
+        plus.classList.remove("on");
+        void plus.offsetWidth;
+        plus.classList.add("on");
+        window.clearTimeout(plus._t);
+        plus._t = window.setTimeout(function(){ plus.classList.remove("on"); }, 300);
+      }
+      var live = $("#demo-live");
+      if (live) live.textContent = "能量 " + demoEnergy + " / 6。";
+    });
+  }
+  renderDemo();
+})();
+</script>
+</body>
+</html>

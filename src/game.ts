@@ -5,17 +5,16 @@
  */
 
 import { GameApp } from './ui';
+import { setBrowserShareOrigin } from './config/runtime';
+import { attachArtwork, attachShareCard, GameCanvas, WindowMetrics, WxRuntime, initWechatCloud } from './platform/wechat';
 
 interface WxMiniGameGlobal {
-  wx?: {
-    createCanvas?: () => HTMLCanvasElement;
-    getSystemInfoSync?: () => { windowWidth: number; windowHeight: number; pixelRatio: number };
-    onTouchStart?: (
-      cb: (res: { touches: Array<{ clientX: number; clientY: number }> }) => void
-    ) => void;
-    cloud?: {
-      init?: (opts: { traceUser: boolean }) => void;
-    };
+  wx?: WxRuntime & {
+    getSystemInfoSync?: () => WindowMetrics;
+    getWindowInfo?: () => WindowMetrics;
+    getMenuButtonBoundingClientRect?: () => { bottom: number };
+    onTouchStart?: (cb: (res: { touches: Array<{ clientX: number; clientY: number }> }) => void) => void;
+    onWindowResize?: (callback: () => void) => void;
   };
 }
 
@@ -24,27 +23,31 @@ export function bootstrapGame(): GameApp {
   const g = globalThis as unknown as WxMiniGameGlobal;
 
   if (g.wx && typeof g.wx.createCanvas === 'function') {
-    if (g.wx.cloud && typeof g.wx.cloud.init === 'function') {
-      try {
-        g.wx.cloud.init({ traceUser: true });
-      } catch {
-        // ignore if cloud env not configured yet
-      }
-    }
-
-    const canvas = g.wx.createCanvas();
-    const sys = g.wx.getSystemInfoSync
-      ? g.wx.getSystemInfoSync()
-      : { windowWidth: 375, windowHeight: 812, pixelRatio: 2 };
-
-    const dpr = sys.pixelRatio || 2;
-    canvas.width = sys.windowWidth * dpr;
-    canvas.height = sys.windowHeight * dpr;
-
+    initWechatCloud(g.wx);
+    const canvas = g.wx.createCanvas() as GameCanvas;
+    const metrics = () => g.wx?.getWindowInfo?.() ?? g.wx?.getSystemInfoSync?.() ??
+      { windowWidth: 375, windowHeight: 812, pixelRatio: 2 };
+    let sys = metrics();
     const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(dpr, dpr);
-    }
+    const resize = () => {
+      sys = metrics();
+      const ratio = sys.pixelRatio || 2;
+      canvas.width = sys.windowWidth * ratio;
+      canvas.height = sys.windowHeight * ratio;
+      ctx?.setTransform(ratio, 0, 0, ratio, 0, 0);
+      app.pointerPosition = null;
+    };
+    resize();
+    g.wx.onWindowResize?.(resize);
+    attachArtwork(app, canvas.createImage?.bind(canvas) ?? g.wx.createImage?.bind(g.wx));
+    attachShareCard(app, () => g.wx!.createCanvas!() as GameCanvas);
+    const menuRect = g.wx.getMenuButtonBoundingClientRect?.();
+    app.setNativeMenuRect(menuRect ? { left: menuRect.left, bottom: menuRect.bottom } : null);
+    void app.onForeground(g.wx.getLaunchOptionsSync?.().query);
+    g.wx.onShow?.((options) => { void app.onForeground(options.query); });
+    g.wx.onHide?.(() => app.onBackground());
+    g.wx.onShareAppMessage?.(() => app.getSharePayload());
+    g.wx.showShareMenu?.({ withShareTicket: true, menus: ['shareAppMessage'] });
 
     if (typeof g.wx.onTouchStart === 'function') {
       g.wx.onTouchStart((res) => {
@@ -54,7 +57,8 @@ export function bootstrapGame(): GameApp {
           touch.clientX,
           touch.clientY,
           sys.windowWidth,
-          sys.windowHeight
+          sys.windowHeight,
+          true
         );
       });
     }
@@ -73,18 +77,37 @@ export function bootstrapGame(): GameApp {
   if (typeof document !== 'undefined') {
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement | null;
     if (canvas) {
-      const logicalW = 390;
-      const logicalH = 844;
-      const dpr = window.devicePixelRatio || 2;
-      canvas.width = logicalW * dpr;
-      canvas.height = logicalH * dpr;
-      canvas.style.width = `${logicalW}px`;
-      canvas.style.height = `${logicalH}px`;
-
+      attachArtwork(app);
+      let logicalW = 390;
+      let logicalH = 844;
       const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.scale(dpr, dpr);
-      }
+      const resizeCanvas = () => {
+        logicalW = Math.min(390, Math.max(280, Math.floor(window.innerWidth - 36)));
+        logicalH = Math.min(844, Math.max(500, Math.floor(window.innerHeight - 36)));
+        const dpr = window.devicePixelRatio || 2;
+        canvas.width = logicalW * dpr;
+        canvas.height = logicalH * dpr;
+        canvas.style.width = `${logicalW}px`;
+        canvas.style.height = `${logicalH}px`;
+        ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
+        app.pointerPosition = null;
+      };
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      const query = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+      void app.onForeground(query);
+      void fetch('/api/config')
+        .then((response) => response.ok ? response.json() : null)
+        .then((config: { shareOrigin?: string } | null) => setBrowserShareOrigin(config?.shareOrigin ?? ''))
+        .catch(() => {});
+      const heartbeat = window.setInterval(() => {
+        if (app.currentRoom?.status === 'waiting') void app.onForeground();
+      }, 5000);
+      window.addEventListener('pagehide', () => {
+        window.clearInterval(heartbeat);
+        app.onBackground();
+      });
+      window.addEventListener('pageshow', () => { void app.onForeground(); });
 
       canvas.addEventListener('pointerdown', (ev) => {
         const rect = canvas.getBoundingClientRect();
@@ -92,9 +115,31 @@ export function bootstrapGame(): GameApp {
         const y = ((ev.clientY - rect.top) / rect.height) * logicalH;
         app.handlePointerTap(x, y, logicalW, logicalH);
       });
+      canvas.addEventListener('pointermove', (ev) => {
+        if (ev.pointerType === 'touch') return;
+        const rect = canvas.getBoundingClientRect();
+        app.handlePointerMove(
+          ((ev.clientX - rect.left) / rect.width) * logicalW,
+          ((ev.clientY - rect.top) / rect.height) * logicalH
+        );
+      });
+      canvas.addEventListener('pointerleave', () => { app.pointerPosition = null; });
+      canvas.addEventListener('contextmenu', (ev) => ev.preventDefault());
+      window.addEventListener('keydown', (ev) => {
+        if (app.handleKeyInput(ev.key)) ev.preventDefault();
+      });
+      window.addEventListener('paste', (ev) => {
+        if (app.currentPage !== 'online_room' || app.currentRoom) return;
+        const text = ev.clipboardData?.getData('text') ?? '';
+        const digits = text.replace(/\D/g, '');
+        if (digits.length === 6) {
+          app.inputRoomCode = digits;
+          ev.preventDefault();
+        }
+      });
 
       const loop = () => {
-        if (ctx) {
+        if (ctx && app.visible) {
           app.render(ctx, logicalW, logicalH, Date.now());
         }
         requestAnimationFrame(loop);

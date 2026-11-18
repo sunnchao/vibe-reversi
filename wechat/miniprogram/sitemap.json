@@ -1,0 +1,4 @@
+{
+  "desc": "好友房通过分享邀请进入，不将房号作为搜索入口",
+  "rules": [{ "action": "allow", "page": "pages/index/index" }]
+}

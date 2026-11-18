@@ -1,0 +1,11 @@
+{
+  "pages": ["pages/index/index"],
+  "window": {
+    "navigationBarTitleText": "翻盘棋",
+    "navigationBarBackgroundColor": "#e9e3d4",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#e9e3d4"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

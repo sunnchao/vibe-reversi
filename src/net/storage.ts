@@ -14,7 +14,20 @@ export interface UserProgress {
   totalGames: number;
   biggestFlipRecord: number;     // 历史最大单步翻子数记录
   titles: string[];              // 获得的称号列表
+  records: MatchRecord[];         // 本机最近完成的对局，用于 Open Design 的「我的棋谱」
   updatedAt: number;
+}
+
+export interface MatchRecord {
+  id: string;
+  finishedAt: number;
+  mode: 'ai' | 'local2p' | 'online';
+  black: number;
+  white: number;
+  winner: 1 | 2 | 'DRAW';
+  reason: 'BOARD_FULL' | 'BOTH_NO_MOVES' | 'WIPEOUT' | 'SURRENDER' | 'FINISHED';
+  steps: number;
+  maxFlip: number;
 }
 
 const STORAGE_KEY = 'vibe_reversi_user_progress_v1';
@@ -29,6 +42,7 @@ export function createDefaultProgress(): UserProgress {
     totalGames: 0,
     biggestFlipRecord: 0,
     titles: ['初出茅庐'],
+    records: [],
     updatedAt: Date.now(),
   };
 }
@@ -101,6 +115,21 @@ export function loadLocalProgress(): UserProgress {
 export function saveLocalProgress(progress: UserProgress): void {
   progress.updatedAt = Date.now();
   setLocalRaw(STORAGE_KEY, JSON.stringify(progress));
+}
+
+export function appendMatchRecord(
+  progress: UserProgress,
+  record: MatchRecord
+): UserProgress {
+  const next: UserProgress = {
+    ...progress,
+    records: [record, ...progress.records.filter((item) => item.id !== record.id)]
+      .sort((a, b) => b.finishedAt - a.finishedAt)
+      .slice(0, 30),
+    updatedAt: Date.now(),
+  };
+  saveLocalProgress(next);
+  return next;
 }
 
 /**
@@ -180,6 +209,11 @@ export function mergeLocalAndCloudProgress(
     totalGames: Math.max(local.totalGames, cloud.totalGames),
     biggestFlipRecord: Math.max(local.biggestFlipRecord, cloud.biggestFlipRecord),
     titles: Array.from(titleSet),
+    records: Array.from(
+      new Map(
+        [...(local.records ?? []), ...(cloud.records ?? [])].map((record) => [record.id, record])
+      ).values()
+    ).sort((a, b) => b.finishedAt - a.finishedAt).slice(0, 30),
     updatedAt: Math.max(local.updatedAt, cloud.updatedAt),
   };
 

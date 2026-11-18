@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createGame, Piece } from '../src/core';
-import { executeAITurn, computeAIDecision } from '../src/ai';
+import * as core from '../src/core';
+import { getValidMoves } from '../src/core/board';
+import { executeAITurn, computeAIDecision, computeAIMove } from '../src/ai';
 import { STAGES_CONFIG, getStageConfig } from '../src/config/stages';
 import {
   createDefaultProgress,
@@ -9,6 +11,44 @@ import {
 } from '../src/net/storage';
 
 describe('阶段 4：人机 AI 与 20 关闯关系统验收测试', () => {
+  it('共享有界搜索在节点耗尽时回退到合法落子，且不修改输入棋盘', () => {
+    const board = createGame({ blackSkills: [], whiteSkills: [] }).board;
+    const before = board.map(row => [...row]);
+    const legal = getValidMoves(board, Piece.Black).map(({ row, col }) => row * 8 + col);
+    const move = computeAIMove(board, Piece.Black, 'L3', { nodeBudget: 0 });
+    expect(move).toBeDefined();
+    expect(legal).toContain(move!.row * 8 + move!.col);
+    expect(board).toEqual(before);
+
+    const state = createGame({ blackSkills: [], whiteSkills: [] });
+    const decision = computeAIDecision(state, 'L3_BOSS', { nodeBudget: 1 });
+    expect(decision.actionType).toBe('move');
+    expect(legal).toContain(decision.position!.row * 8 + decision.position!.col);
+    expect(computeAIMove(board, Piece.Black, 'L3', { timeBudgetMs: 0 })).toEqual({ row: 2, col: 3 });
+  });
+
+  it('截止时间和节点预算会终止整棵搜索，不继续处理兄弟分支或技能', () => {
+    const state = createGame({ blackSkills: ['bomb', 'double', 'shield'], blackInitialEnergy: 100, whiteSkills: [] });
+    const before = JSON.stringify(state);
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1000);
+    const apply = vi.spyOn(core, 'applyBoardAction');
+    try {
+      computeAIDecision(state, 'L3_BOSS', { nodeBudget: 2 });
+      const boundedClockReads = now.mock.calls.length;
+      now.mockClear();
+      computeAIDecision(state, 'L3_BOSS');
+      expect(now.mock.calls.length).toBeGreaterThan(boundedClockReads * 10);
+      now.mockReset().mockReturnValueOnce(1000).mockReturnValue(1121);
+      const expired = computeAIDecision(state, 'L3_BOSS');
+      expect(expired).toEqual({ actionType: 'move', position: { row: 2, col: 3 } });
+      expect(now.mock.calls.length).toBeLessThanOrEqual(3);
+      apply.mockClear();
+      computeAIDecision(state, 'L3_BOSS', { nodeBudget: 0 });
+      expect(apply).not.toHaveBeenCalled();
+      expect(JSON.stringify(state)).toBe(before);
+    } finally { now.mockRestore(); apply.mockRestore(); }
+  });
+
   it('20 关配置表完整性与解锁存档逻辑验证', () => {
     expect(STAGES_CONFIG).toHaveLength(20);
     // 1-5 关：L1，AI 无技能
